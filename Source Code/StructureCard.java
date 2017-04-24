@@ -10,7 +10,6 @@ public abstract class StructureCard extends Card{
 	protected int power;
 	protected int transferablePower;
 	protected int income;
-	protected String imagePath;
 	protected Arrow inwardArrow;
 	protected ArrayList<Arrow> outwardArrows;
 	protected HashMap<Arrow, GroupCard> children = new HashMap<Arrow, GroupCard>();
@@ -48,12 +47,11 @@ public abstract class StructureCard extends Card{
 	//Constructor Method
 	public StructureCard(String name, int power, int transferablePower, int income, String imagePath,
 						  Arrow inwardArrow){
-		super(name);
+		super(name, imagePath);
 		
 		this.power = power;
 		this.transferablePower = transferablePower;
 		this.income = income;
-		this.imagePath = imagePath;
 		this.inwardArrow = inwardArrow;
 	}
 	
@@ -89,4 +87,28 @@ public abstract class StructureCard extends Card{
 		}
 		return false;
 	}
+	
+	//Calculates the modifier based on attacker power and defender resistance (or defender power if attack to destroy)
+		public int CalculatePowerModifier(GroupCard defendingGroup, Global.AttackType attackType){
+			if(attackType == Global.AttackType.DESTROY){
+				//TODO - This occurs when Whispering Campaign is active. Make sure this is checked somewhere!
+				if(defendingGroup.Power() == 0){
+					return this.Power() - defendingGroup.Resistance();
+				}else{
+					return this.Power() - defendingGroup.Power();
+				}
+			}else{
+				//TODO - Add check for Gun Lobby
+				return this.Power() - defendingGroup.Resistance();
+			}
+		}
+
+	@Override
+	public String toString() {
+		return "StructureCard [name=" + name + ", power=" + power + ", transferablePower=" + transferablePower
+				+ ", income=" + income + ", imagePath=" + imagePath + ", inwardArrow=" + inwardArrow
+				+ ", outwardArrows=" + outwardArrows + ", children=" + children + "]" + System.getProperty("line.separator");
+	}
+	
+	
 }

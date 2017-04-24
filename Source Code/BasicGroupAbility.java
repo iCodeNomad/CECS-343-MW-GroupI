@@ -38,4 +38,13 @@ public class BasicGroupAbility{
 		
 		this.alignment = alignment;
 	}
+
+	@Override
+	public String toString() {
+		return "BasicGroupAbility [getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()="
+				+ super.toString() + ", abilityType=" + abilityType + ", groups=" + groups + ", attackType="
+				+ attackType + ", alignment=" + alignment + ", amount=" + amount + "]";
+	}
+	
+	
 }
