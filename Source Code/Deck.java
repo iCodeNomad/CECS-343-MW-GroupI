@@ -24,6 +24,10 @@ public class Deck {
 	//Called once in the constructor
 	private void createDeck(){
 		
+		//******************Ryan will add the following:****************************
+				//DONE ALREADY - NOT IN PAGE ORDER: Nuclear Power Companies, The Mafia
+				//NEED TO ADD Orbital Mind Control Lasers, Punk Rockers, Post Office
+		
 		//---------------------------------CREATE GROUP CARDS-----------------------------------------------
 		BasicGroupAbility ability;
 		ArrayList<GroupCard.Arrow> outwardArrows;
@@ -138,9 +142,6 @@ public class Deck {
 		outwardArrows.add(GroupCard.Arrow.BOTTOM);
 		groupCard = new GroupCard("The Mafia", 7, 0, 7, 6, IMAGE_PATH + "TheMafia.png", GroupCard.Arrow.RIGHT, outwardArrows, GroupCard.Alignment.CRIMINAL, ability);				
 		deck.add(groupCard);
-		
-		
-		//DONE ALREADY - NOT IN PAGE ORDER: Nuclear Power Companies, The Mafia
 		
 		//------------------------------CREATE ILLUMINATI CARDS----------------------------------------------
 		

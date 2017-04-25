@@ -13,6 +13,9 @@ public abstract class StructureCard extends Card{
 	protected Arrow inwardArrow;
 	protected ArrayList<Arrow> outwardArrows;
 	protected HashMap<Arrow, GroupCard> children = new HashMap<Arrow, GroupCard>();
+	protected Player owner;
+	protected int attackCounter;
+	protected int currentMoney;
 	
 	//Accessor Methods
 	
@@ -42,6 +45,18 @@ public abstract class StructureCard extends Card{
 	
 	public HashMap<Arrow, GroupCard> Children(){
 		return this.children;
+	}
+	
+	public Player Owner(){
+		return this.owner;
+	}
+	
+	public int AttackCounter(){
+		return this.attackCounter;
+	}
+	
+	public int CurrentMoney(){
+		return this.currentMoney;
 	}
 	
 	//Constructor Method
@@ -89,19 +104,30 @@ public abstract class StructureCard extends Card{
 	}
 	
 	//Calculates the modifier based on attacker power and defender resistance (or defender power if attack to destroy)
-		public int CalculatePowerModifier(GroupCard defendingGroup, Global.AttackType attackType){
-			if(attackType == Global.AttackType.DESTROY){
-				//TODO - This occurs when Whispering Campaign is active. Make sure this is checked somewhere!
-				if(defendingGroup.Power() == 0){
-					return this.Power() - defendingGroup.Resistance();
-				}else{
-					return this.Power() - defendingGroup.Power();
-				}
-			}else{
-				//TODO - Add check for Gun Lobby
-				return this.Power() - defendingGroup.Resistance();
+	public int CalculatePowerModifier(GroupCard defendingGroup, Global.AttackType attackType){
+		//Modifier for Society of Assassins and Servants of Cthulhu
+		int modifier = 0;
+		
+		if(attackType == Global.AttackType.DESTROY){
+			if(this.owner.Illuminati().Name() == "The Servants of Cthulhu"){
+				modifier = 2;
 			}
+			
+			//TODO - This occurs when Whispering Campaign is active. Make sure this is checked somewhere!
+			if(defendingGroup.Power() == 0){
+				return this.Power() + modifier - defendingGroup.Resistance();
+			}else{
+				return this.Power() + modifier - defendingGroup.Power();
+			}
+		}else if(attackType == Global.AttackType.NEUTRALIZE){
+			if(this.owner.Illuminati().Name() == "The Society of Assassins"){
+				modifier = 4;
+			}
+			return this.Power() + 6 + modifier - defendingGroup.Resistance();
+		}else{				//ATTACK TO CONTROL
+			return this.Power() - defendingGroup.Resistance();
 		}
+	}
 
 	@Override
 	public String toString() {

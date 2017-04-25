@@ -137,6 +137,9 @@ public class GroupCard extends StructureCard implements MainDeckCard{
 	}
 	
 	public int CalculateDirectControlAbility(GroupCard defendingGroup, Global.AttackType attackType){
+		
+		//CHANGE ME TO USE hasAlignment
+		
 		for(BasicGroupAbility i: this.abilities){
 			if (i.abilityType == Global.AbilityType.DIRECT_CONTROL && attackType == Global.AttackType.CONTROL){
 				for(GroupCard j: i.groups){
@@ -145,15 +148,33 @@ public class GroupCard extends StructureCard implements MainDeckCard{
 					}
 				}
 				
-				for(Alignment j: defendingGroup.alignments){
-					if(j == i.alignment){
-						return i.amount;
-					}
+				if(defendingGroup.hasAlignment(i.alignment)){
+					return i.amount;
 				}
 			}
 		}
 		
 		return 0;
+	}
+	
+	
+	public int GunLobbyCheck(GroupCard defendingGroup){
+		if(defendingGroup.name == "Gun Lobby"){
+			if(this.hasAlignment(Alignment.COMMUNIST) || this.hasAlignment(Alignment.LIBERAL) || this.hasAlignment(Alignment.WEIRD)){
+				return -7;
+			}
+		}
+		return 0;
+	}
+	
+	//Returns true if this card has alignment a
+	public boolean hasAlignment(Alignment a){
+		for(Alignment i:this.alignments){
+			if(i == a){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override

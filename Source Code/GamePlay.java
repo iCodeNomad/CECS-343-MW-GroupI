@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class GamePlay {
 	
 	//Attributes - Attacking
@@ -19,63 +21,146 @@ public class GamePlay {
 	//-----------------------------------------Attacking--------------------------------------------
 	
 	//Call this method to start the attack
-	public void attack(){
-		Global.AttackType attackType = promptAttackType();
-		StructureCard attackingGroup = promptAttackingGroup();
+	public void attack(Player attackingPlayer){
+		Global.AttackType attackType = PromptAttackType();
+		StructureCard attackingGroup = PromptAttackingGroup();
 		GroupCard defendingGroup;
+		
+		ArrayList<GroupCard> aidingGroups;
+		
+		Global.Privilege privilege = Global.Privilege.NOT_PRIVILEGED;
 		
 		
 		//Select defending group, with checks based on attack type
 		if(attackType == Global.AttackType.CONTROL){
-			defendingGroup = promptDefendingGroupControl();
+			defendingGroup = PromptDefendingGroupControl();
 		}else if(attackType == Global.AttackType.NEUTRALIZE){
-			defendingGroup = promptDefendingGroupNeutralize();
+			defendingGroup = PromptDefendingGroupNeutralize();
 		}else{		//Global.AttackType.DESTROY
-			defendingGroup = promptDefendingGroupDestroy();
-		}
-		
-		//Change attack modifier based on alignments of attacking and defending groups
-		if(attackingGroup instanceof GroupCard){
-			attackModifier += ((GroupCard) attackingGroup).CalculateAlignmentModifier(defendingGroup, attackType);
+			defendingGroup = PromptDefendingGroupDestroy();
 		}
 		
 		//Change attack modifier based on power and resistance
 		attackModifier += attackingGroup.CalculatePowerModifier(defendingGroup, attackType);
 		
-		//TODO - Add BFS to calculate attack modifier based on power structure position
+		//For group cards only
+		if(attackingGroup instanceof GroupCard){
+			//Change attack modifier based on alignments of attacking and defending groups
+			attackModifier += ((GroupCard) attackingGroup).CalculateAlignmentModifier(defendingGroup, attackType);
+			
+			//Check for Gun Lobby ability
+			attackModifier += ((GroupCard) attackingGroup).GunLobbyCheck(defendingGroup);
+					
+			//Calculate attack modifier based on "direct control" ability
+			attackModifier += ((GroupCard) attackingGroup).CalculateDirectControlAbility(defendingGroup, attackType);
+			
+			//TODO - Add BFS to calculate attack modifier based on power structure position
+		}		
 		
 		//TODO - Calculate power structure's "Any Attempt" abilities
 		
-		//Calculate attack modifier based on "direct control" ability
-		attackModifier += ((GroupCard) attackingGroup).CalculateDirectControlAbility(defendingGroup, attackType);
+		//Check for Chinese Campaign Donors special ability
+		attackModifier += CheckChineseCampaignDonors(defendingGroup);
 		
-		//NEXT - Chinese Campaign Donors? Or go back and look at extensions
+		//TODO - Add "Survivalists" ability
+		
+		//TODO - Add groups to aid attack.
+		aidingGroups = PromptAidingGroups();
+		
+		//Maybe combine this with PromptAidingGroups().
+		//Calculates the effect of transferable power
+		attackModifier += CalculateAidingGroups(aidingGroups);
+		
+		//TODO - Bavarian Illuminati Special Attack
+		privilege = BavarianIlluminatiSpecial();
+		
+		//TODO - Discard Special Card for Privilege
+		if(privilege != Global.Privilege.PRIVILEGED){
+			privilege = DiscardForPrivilege();
+		}
+		
+		//TODO - Deep Agent
+		if(privilege == Global.Privilege.PRIVILEGED){
+			//Add code for Deep Agent
+		}
+		
+		//TODO - Discard two cards to abolish privilege
+		if(privilege == Global.Privilege.PRIVILEGED){
+			privilege = DiscardForAbolish();
+		}
+		
+		//Spending phase of attack
+		
 	}
 	
-	private Global.AttackType promptAttackType(){
+	private Global.AttackType PromptAttackType(){
 		//TODO - Add logic to display pop-up with the three attack options
 		//Return based on player's response.
 		return Global.AttackType.CONTROL;
 	}
 	
-	private StructureCard promptAttackingGroup(){
+	private StructureCard PromptAttackingGroup(){
 		//TODO - Add logic to select an attacking group based on cards in structure
 		return null;
 	}
 	
-	private GroupCard promptDefendingGroupControl(){
+	private GroupCard PromptDefendingGroupControl(){
 		//TODO - Add logic to select a defending group based on cards in play for an attack to control
+		//REMEMBER TO ADD CHECKS FOR DISCORDIAN SOCIETY
 		return null;
 	}
 	
-	private GroupCard promptDefendingGroupNeutralize(){
+	private GroupCard PromptDefendingGroupNeutralize(){
 		//TODO - Add logic to select a defending group based on cards in play for an attack to neutralize
+		//REMEMBER TO ADD CHECKS FOR DISCORDIAN SOCIETY
 		return null;
 	}
 	
-	private GroupCard promptDefendingGroupDestroy(){
+	private GroupCard PromptDefendingGroupDestroy(){
 		//TODO - Add logic to select a defending group based on cards in play for an attack to destroy
+		//REMEMBER TO ADD CHECKS FOR DISCORDIAN SOCIETY
 		return null;
+	}
+	
+	private int CheckChineseCampaignDonors(GroupCard defendingGroup){
+		//REMEMBER TO ADD CHECKS FOR DISCORDIAN SOCIETY
+		if(defendingGroup.hasAlignment(GroupCard.Alignment.GOVERNMENT)){
+			return 4;
+		}
+		return 0;
+	}
+	
+	private ArrayList<GroupCard> PromptAidingGroups(){
+		//TODO - Add logic to select aiding groups
+		return null;
+	}
+	
+	private int CalculateAidingGroups(ArrayList<GroupCard> aidingGroups){
+		int aidingPower = 0;
+		
+		if(aidingGroups.isEmpty()){
+			return 0;
+		}
+		for(GroupCard card:aidingGroups){
+			aidingPower += card.transferablePower;
+		}
+		
+		return aidingPower;
+	}
+	
+	private Global.Privilege BavarianIlluminatiSpecial(){
+		//TODO - Add logic to check if player is Bavarian Illuminati, prompt, response, 5MB, etc.
+		return Global.Privilege.NOT_PRIVILEGED;
+	}
+	
+	private Global.Privilege DiscardForPrivilege(){
+		//TODO - Add logic to prompt player to discard special for privilege
+		return Global.Privilege.NOT_PRIVILEGED;
+	}
+	
+	private Global.Privilege DiscardForAbolish(){
+		//TODO - Add logic to prompt player to discard specials to abolish privilege
+		return Global.Privilege.NOT_PRIVILEGED;
 	}
 
 }

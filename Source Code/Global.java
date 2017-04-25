@@ -8,4 +8,8 @@ public class Global {
 	public enum AttackType{
 		CONTROL, NEUTRALIZE, DESTROY, ALL;
 	}
+	
+	public enum Privilege{
+		PRIVILEGED, NOT_PRIVILEGED, ABOLISHED;
+	}
 }
