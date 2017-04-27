@@ -4,8 +4,11 @@ import java.util.Random;
 
 public class Deck {
 	
-	public static final String IMAGE_PATH = "img/";
-
+	//CHANGE ME BACK LATER
+	//public static final String IMAGE_PATH = "img/";
+	public static final String IMAGE_PATH = "C:/Users/Ryan/eclipse/workspace/Illuminati2/src/img/";
+	
+	
 	//Class Attributes
 	private ArrayList<MainDeckCard> deck;
 	private ArrayList<IlluminatiCard> illuminatiDeck;

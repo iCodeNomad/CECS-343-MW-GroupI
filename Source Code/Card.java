@@ -10,6 +10,10 @@ public abstract class Card extends Object {
 		return this.name;
 	}
 	
+	public String ImagePath(){
+		return this.imagePath;
+	}
+	
 	//Constructor Methods
 	public Card(String name, String imagePath){
 		this.name = name;

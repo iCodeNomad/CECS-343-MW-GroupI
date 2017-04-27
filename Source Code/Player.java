@@ -48,4 +48,18 @@ public class Player {
 		groupCards.add(groupCard);
 		groupCard.owner = this;
 	}
+	
+	//Player draws a card from the deck
+	//Card is added to player's hand
+	public void DrawCard(Deck deck){
+		MainDeckCard card = deck.drawCard();
+		
+		if(card instanceof GroupCard){
+			groupCards.add((GroupCard) card);
+		}else{
+			specialCards.add((SpecialCard) card);
+		}
+	}
+		
+		
 }
