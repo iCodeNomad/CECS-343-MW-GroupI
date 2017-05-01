@@ -2,10 +2,14 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
@@ -85,19 +89,7 @@ public class GUI {
 		gamePanel.setLayout(null);
 		
 		//-----------------------------FOR TESTING PURPOSES---------------------------------------
-		player.DrawCard(deck);
-		player.DrawCard(deck);
-		player.DrawCard(deck);
-		player.DrawCard(deck);
-		player.DrawCard(deck);
 		
-		Card card = (Card) deck.drawCard();
-		CardGUI cardGUI = new CardGUI(card, 5, 10);
-		//gamePanel.addCard(cardGUI, new Point(29, 0));
-		card = (Card) deck.drawCard();
-		cardGUI = new CardGUI(card, 5, 10);
-		//gamePanel.addCard(cardGUI, new Point(6, 6));
-		gamePanel.displayCards();
 		GenerateHand(player, cardsPanel);
 		
 		final String IMAGE_PATH = "./src/img/";
@@ -143,6 +135,22 @@ public class GUI {
 		gamePanel.addCard(new CardGUI(groupCard3, 0, 0), new CardGUI(player.Illuminati(), 0, 0));
 		
 		//--------------------------------------END TESTING--------------------------------------------
+		
+		//Add the deck to the field
+		JLabel fieldDeck = new JLabel("");
+		ImageIcon imageIcon = new ImageIcon("./src/img/Deck.png");
+		Image scaledImage = imageIcon.getImage().getScaledInstance(150, 90, Image.SCALE_SMOOTH);
+		fieldDeck.setIcon(new ImageIcon(scaledImage));
+		fieldDeck.setBounds(10, 480, 150, 90);
+		gamePanel.add(fieldDeck);
+		fieldDeck.addMouseListener(new MouseAdapter(){
+			@Override
+			public void mouseClicked(MouseEvent e){
+				player.DrawCard(deck);
+				GenerateHand(player, cardsPanel);
+				frame.repaint();
+			}
+		});
 		
 		textField_1 = new JTextField();
 		textField_1.setText("$20");
