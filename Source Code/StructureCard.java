@@ -6,6 +6,10 @@ public abstract class StructureCard extends Card{
 		TOP, BOTTOM, LEFT, RIGHT;
 	}
 	
+	public static enum Rotation{
+		UP, RIGHT, DOWN, LEFT;
+	}
+	
 	//Class Attributes
 	protected int power;
 	protected int transferablePower;
@@ -16,6 +20,7 @@ public abstract class StructureCard extends Card{
 	protected Player owner;
 	protected int attackCounter;
 	protected int currentMoney;
+	protected Rotation rotation;
 	
 	//Accessor Methods
 	
@@ -59,6 +64,10 @@ public abstract class StructureCard extends Card{
 		return this.currentMoney;
 	}
 	
+	public Rotation Rotation(){
+		return this.rotation;
+	}
+	
 	//Constructor Method
 	public StructureCard(String name, int power, int transferablePower, int income, String imagePath,
 						  Arrow inwardArrow){
@@ -69,6 +78,7 @@ public abstract class StructureCard extends Card{
 		this.income = income;
 		this.inwardArrow = inwardArrow;
 	}
+	
 	
 	//Add child group card
 	//Checks if the control arrow exists and is available, then adds the new child card to children.
@@ -82,6 +92,9 @@ public abstract class StructureCard extends Card{
 			else{
 				children.put(arrow, card);
 				card.parent = this;
+				card.parentArrow = arrow;
+				
+				card.rotation = card.calculateRotation();
 				
 				return true;
 			}

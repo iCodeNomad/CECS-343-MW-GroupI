@@ -2,13 +2,10 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
@@ -76,14 +73,18 @@ public class GUI {
 		panel.add(cardsPanel);
 		cardsPanel.setLayout(null);
 		
-		FieldGUI gamePanel = new FieldGUI();
+		Player player = new Player("Joe");
+		Deck deck = new Deck();
+		player.SetIlluminati(deck.drawIlluminati());
+		
+		FieldGUI gamePanel = new FieldGUI(new CardGUI(player.Illuminati(), 5, 10));
 		gamePanel.setBorder(new LineBorder(new Color(0, 0, 0), 3));
 		gamePanel.setBackground(new Color(255, 255, 240));
 		gamePanel.setBounds(6, 6, 1049, 583);
 		panel.add(gamePanel);
 		gamePanel.setLayout(null);
-		Player player = new Player("Joe");
-		Deck deck = new Deck();
+		
+		//-----------------------------FOR TESTING PURPOSES---------------------------------------
 		player.DrawCard(deck);
 		player.DrawCard(deck);
 		player.DrawCard(deck);
@@ -91,15 +92,57 @@ public class GUI {
 		player.DrawCard(deck);
 		
 		Card card = (Card) deck.drawCard();
-		CardGUI cardGUI = new CardGUI(card, new Rectangle(5, 10, 150, 90));
-		gamePanel.addCard(cardGUI, new Point(29, 0));
+		CardGUI cardGUI = new CardGUI(card, 5, 10);
+		//gamePanel.addCard(cardGUI, new Point(29, 0));
 		card = (Card) deck.drawCard();
-		cardGUI = new CardGUI(card, new Rectangle(5, 10, 150, 90));
-		gamePanel.addCard(cardGUI, new Point(6, 6));
+		cardGUI = new CardGUI(card, 5, 10);
+		//gamePanel.addCard(cardGUI, new Point(6, 6));
 		gamePanel.displayCards();
 		GenerateHand(player, cardsPanel);
 		
+		final String IMAGE_PATH = "./src/img/";
 		
+		BasicGroupAbility ability;
+		ArrayList<GroupCard.Arrow> outwardArrows;
+		GroupCard groupCard;
+		ArrayList<GroupCard.Alignment> alignments;
+		
+		//American Autoduel Association
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.RIGHT);
+		alignments = new ArrayList<GroupCard.Alignment>();
+		alignments.add(GroupCard.Alignment.VIOLENT);
+		alignments.add(GroupCard.Alignment.WEIRD);
+		groupCard = new GroupCard("American Autoduel Association", 1, 0, 5, 1, IMAGE_PATH + "AmericanAutoduelAssociation.png", GroupCard.Arrow.LEFT, outwardArrows, alignments);				
+		
+		//Nuclear Power Companies
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.LEFT);
+		GroupCard groupCard2 = new GroupCard("Nuclear Power Companies", 4, 0, 4, 3, IMAGE_PATH + "NuclearPowerCompanies.png", GroupCard.Arrow.RIGHT, outwardArrows, GroupCard.Alignment.CONSERVATIVE);				
+		
+		//Add American Autoduel Association
+		player.Illuminati().AddChild(groupCard, IlluminatiCard.Arrow.RIGHT);
+		gamePanel.addCard(new CardGUI(groupCard, 0, 0), new CardGUI(player.Illuminati(), 0, 0));
+		
+		//Add Nuclear Power Companies
+		groupCard.AddChild(groupCard2, StructureCard.Arrow.RIGHT);
+		gamePanel.addCard(new CardGUI(groupCard2, 0, 0), new CardGUI(groupCard, 0, 0));
+		
+		//Big Media
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.TOP);
+		outwardArrows.add(GroupCard.Arrow.LEFT);
+		outwardArrows.add(GroupCard.Arrow.BOTTOM);
+		alignments = new ArrayList<GroupCard.Alignment>();
+		alignments.add(GroupCard.Alignment.LIBERAL);
+		alignments.add(GroupCard.Alignment.STRAIGHT);
+		GroupCard groupCard3 = new GroupCard("Big Media", 4, 3, 6, 3, IMAGE_PATH + "BigMedia.png", GroupCard.Arrow.RIGHT, outwardArrows, alignments);				
+		
+		//Add Big Media
+		player.Illuminati().AddChild(groupCard3, IlluminatiCard.Arrow.TOP);
+		gamePanel.addCard(new CardGUI(groupCard3, 0, 0), new CardGUI(player.Illuminati(), 0, 0));
+		
+		//--------------------------------------END TESTING--------------------------------------------
 		
 		textField_1 = new JTextField();
 		textField_1.setText("$20");
@@ -246,13 +289,13 @@ public class GUI {
 		int xOffset = 4;
 		
 		for(Card card: groups){
-			CardGUI cardGUI = new CardGUI(card, new Rectangle(xOffset, 10, 150, 90));
+			CardGUI cardGUI = new CardGUI(card, xOffset, 10);
 			panel.add(cardGUI);
 			
 			xOffset += 154;
 		}
 		for(Card card: specials){
-			CardGUI cardGUI = new CardGUI(card, new Rectangle(xOffset, 10, 150, 90));
+			CardGUI cardGUI = new CardGUI(card, xOffset, 10);
 			panel.add(cardGUI);
 			
 			xOffset += 154;

@@ -12,14 +12,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 public class CardGUI extends JLabel {
-
-	public enum Rotation{
-		UP, RIGHT, DOWN, LEFT;
-	}
 	
 	private static final long serialVersionUID = 1L;
 	private Card card;
-	private String imgPath;
 	private Rectangle rectField;
 	
 	public Card Card(){
@@ -30,12 +25,24 @@ public class CardGUI extends JLabel {
 		return this.rectField;
 	}
 
-	public CardGUI(Card card, Rectangle rect) {
+	public CardGUI(Card card, int x, int y) {
 		this.card = card;
-		this.setBounds(rect);
-		this.imgPath = imgPath;
+		if(card instanceof StructureCard){
+			StructureCard structureCard = (StructureCard) card;
+			if(structureCard.Rotation() == StructureCard.Rotation.UP || structureCard.Rotation() == StructureCard.Rotation.DOWN){
+				this.setBounds(new Rectangle(x, y, 150, 90));
+			}else{
+				this.setBounds(new Rectangle(x, y, 90, 150));
+			}
+		}else{
+			this.setBounds(new Rectangle(x, y, 150, 90));
+		}
 		
 		setImage(card.ImagePath());
+	}
+	
+	public CardGUI(Card card){
+		this(card, 0, 0);
 	}
 	
 	public void setImage(String newImgPath){
@@ -49,7 +56,17 @@ public class CardGUI extends JLabel {
 			System.out.println("Error loading image");
 		}
 		if(image != null){
-			image = rotate(image, 180);
+			if(card instanceof StructureCard){
+				StructureCard structureCard = (StructureCard) card;
+				if(structureCard.Rotation() == StructureCard.Rotation.RIGHT){
+					image = rotate(image, 90);
+				}else if(structureCard.Rotation() == StructureCard.Rotation.DOWN){
+					image = rotate(image, 180);
+				}else if(structureCard.Rotation() == StructureCard.Rotation.LEFT){
+					image = rotate(image, 270);
+				}
+			}
+
 			ImageIcon imageIcon = new ImageIcon((Image) image);
 			Image scaledImage = imageIcon.getImage().getScaledInstance(this.getWidth(), this.getHeight(), Image.SCALE_SMOOTH);
 			this.setIcon(new ImageIcon(scaledImage));

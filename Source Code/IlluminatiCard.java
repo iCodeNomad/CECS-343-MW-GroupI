@@ -16,6 +16,7 @@ public class IlluminatiCard extends StructureCard {
 		allArrows.add(Arrow.RIGHT);
 		
 		this.outwardArrows = allArrows;
+		this.rotation = Rotation.UP;
 	}
 
 	@Override

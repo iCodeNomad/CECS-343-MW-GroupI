@@ -21,6 +21,7 @@ public class Deck {
 		illuminatiDeck = new ArrayList<IlluminatiCard>();
 		
 		createDeck();
+		shuffleDeck();
 	}
 	
 	//Creates the cards and places them in the deck
@@ -206,8 +207,7 @@ public class Deck {
 	//Returns null if illuminatiDeck is empty
 	public IlluminatiCard drawIlluminati(){
 		if(illuminatiDeck.size() > 0){
-			int index = random.nextInt(illuminatiDeck.size());
-			return illuminatiDeck.remove(index);
+			return illuminatiDeck.remove(0);
 		}
 		return null;
 	}
@@ -215,6 +215,7 @@ public class Deck {
 	//Randomizes the order of the deck
 	public void shuffleDeck(){
 		Collections.shuffle(deck);
+		Collections.shuffle(illuminatiDeck);
 	}
 	
 	//Removes and returns the top (first) card in the deck.

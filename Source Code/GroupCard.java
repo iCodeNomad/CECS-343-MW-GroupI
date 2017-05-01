@@ -9,6 +9,7 @@ public class GroupCard extends StructureCard implements MainDeckCard{
 	//Class Attributes
 	private ArrayList<Alignment> alignments;
 	protected StructureCard parent;
+	protected StructureCard.Arrow parentArrow;
 	protected int resistance;
 	
 	//BasicGroupAbility needs to be in an array list because one card has two different abilities with different amounts.
@@ -30,6 +31,10 @@ public class GroupCard extends StructureCard implements MainDeckCard{
 	public int Resistance(){
 		return this.resistance;
 	}
+	
+	public StructureCard.Arrow ParentArrow(){
+		return this.parentArrow;
+	}
 
 	//Constructor Methods
 	public GroupCard(String name, int power, int transferablePower, int resistance, int income, 
@@ -39,6 +44,7 @@ public class GroupCard extends StructureCard implements MainDeckCard{
 		
 		this.outwardArrows = outwardArrows;
 		this.resistance = resistance;
+		this.rotation = Rotation.UP;
 	}
 	
 	public GroupCard(String name, int power, int transferablePower, int resistance, int income, 
@@ -82,6 +88,48 @@ public class GroupCard extends StructureCard implements MainDeckCard{
 		
 		this.abilities = new ArrayList<BasicGroupAbility>();
 		this.abilities.add(ability);
+	}
+	
+	//Calculates the rotation of the card based on its parent and the parent arrow it is connected to.
+	public Rotation calculateRotation(){
+		Rotation parentRotation = this.parent.Rotation();
+		StructureCard.Arrow parentArrow = this.parentArrow;
+		
+		int rotationCalc = 0;
+		
+		if(parentRotation == Rotation.RIGHT){
+			rotationCalc += 90;
+		}else if(parentRotation == Rotation.DOWN){
+			rotationCalc += 180;
+		}else if(parentRotation == Rotation.LEFT){
+			rotationCalc += 270;
+		}
+		
+		if(parentArrow == Arrow.LEFT){
+			rotationCalc += 90;
+		}else if(parentArrow == Arrow.TOP){
+			rotationCalc += 180;
+		}else if(parentArrow == Arrow.RIGHT){
+			rotationCalc += 270;
+		}
+		
+		if(this.inwardArrow == Arrow.LEFT){
+			rotationCalc += 90;
+		}else if(this.inwardArrow == Arrow.BOTTOM){
+			rotationCalc += 180;
+		}else if(this.inwardArrow == Arrow.RIGHT){
+			rotationCalc += 270;
+		}
+		
+		if((rotationCalc % 360) == 0){
+			return Rotation.UP;
+		}else if((rotationCalc % 360) == 90){
+			return Rotation.RIGHT;
+		}else if((rotationCalc % 360) == 180){
+			return Rotation.DOWN;
+		}else{ //rotationCalc % 360 == 270
+			return Rotation.LEFT;
+		}
 	}
 	
 	
@@ -179,10 +227,12 @@ public class GroupCard extends StructureCard implements MainDeckCard{
 
 	@Override
 	public String toString() {
-		return "GroupCard [name=" + name + ", power=" + power + ", transferablePower=" + transferablePower + ", income=" + income
-				+ ", imagePath=" + imagePath + ", inwardArrow=" + inwardArrow + ", outwardArrows=" + outwardArrows
-				+ ", children=" + children + ", alignments=" + alignments + ", parent=" + parent
-				+ ", abilities=" + abilities + "]"+ System.getProperty("line.separator");
+		return "GroupCard [alignments=" + alignments + ", parent=" + parent + ", parentArrow=" + parentArrow
+				+ ", resistance=" + resistance + ", abilities=" + abilities + ", power=" + power
+				+ ", transferablePower=" + transferablePower + ", income=" + income + ", inwardArrow=" + inwardArrow
+				+ ", outwardArrows=" + outwardArrows + ", children=" + children + ", owner=" + owner
+				+ ", attackCounter=" + attackCounter + ", currentMoney=" + currentMoney + ", rotation=" + rotation
+				+ ", name=" + name + ", imagePath=" + imagePath + "]";
 	}
 	
 	
