@@ -6,7 +6,7 @@ public class Deck {
 	
 	//CHANGE ME BACK LATER
 	//public static final String IMAGE_PATH = "img/";
-	public static final String IMAGE_PATH = "C:/Users/Ryan/eclipse/workspace/Illuminati2/src/img/";
+	public static final String IMAGE_PATH = "./src/img/";
 	
 	
 	//Class Attributes
