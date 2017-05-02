@@ -49,6 +49,10 @@ public class Player {
 		groupCard.owner = this;
 	}
 	
+	public void RemoveGroupCard(GroupCard groupCard){
+		groupCards.remove(groupCard);
+	}
+	
 	//Player draws a card from the deck
 	//Card is added to player's hand
 	public void DrawCard(Deck deck){

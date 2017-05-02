@@ -34,6 +34,7 @@ public class FieldGUI extends JPanel {
 		cards = new HashMap<CardGUI, Rectangle>();
 		this.illuminati = illuminati;
 		addIlluminati();
+		displayCards();
 	}
 	
 	//Displays all cards on the field
@@ -101,13 +102,15 @@ public class FieldGUI extends JPanel {
 					}
 				}else{
 					if(angle == 0){
-						cards.put(child, new Rectangle(x - 1, y + 5, 5, 3));
-					}else if (angle == 90){
-						cards.put(child, new Rectangle(x - 5, y - 1, 5, 3));
-					}else if (angle == 180){
-						cards.put(child, new Rectangle(x - 1, y - 3, 5, 3));
-					}else{
+						//cards.put(child, new Rectangle(x - 1, y + 5, 5, 3));
 						cards.put(child, new Rectangle(x + 3, y + 1, 5, 3));
+					}else if (angle == 90){
+						cards.put(child, new Rectangle(x - 5, y + 1, 5, 3));
+					}else if (angle == 180){
+						//cards.put(child, new Rectangle(x - 1, y - 3, 5, 3));
+						cards.put(child, new Rectangle(x + 3, y + 1, 5, 3));
+					}else{
+						cards.put(child, new Rectangle(x - 5, y - 1, 5, 3));
 					}
 				}
 			}else{

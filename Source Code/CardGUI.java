@@ -4,18 +4,22 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.Transparency;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 public class CardGUI extends JLabel {
 	
 	private static final long serialVersionUID = 1L;
 	private Card card;
 	private Rectangle rectField;
+	private JPanel panel;
 	
 	public Card Card(){
 		return this.card;
@@ -24,8 +28,12 @@ public class CardGUI extends JLabel {
 	public Rectangle RectField(){
 		return this.rectField;
 	}
+	
+	public JPanel Panel(){
+		return this.panel;
+	}
 
-	public CardGUI(Card card, int x, int y) {
+	public CardGUI(Card card, JPanel panel, int x, int y) {
 		this.card = card;
 		if(card instanceof StructureCard){
 			StructureCard structureCard = (StructureCard) card;
@@ -38,11 +46,21 @@ public class CardGUI extends JLabel {
 			this.setBounds(new Rectangle(x, y, 150, 90));
 		}
 		
+		this.panel = panel;
+		
 		setImage(card.ImagePath());
 	}
 	
+	public CardGUI(Card card, JPanel panel){
+		this(card, panel, 0, 0);
+	}
+	
 	public CardGUI(Card card){
-		this(card, 0, 0);
+		this(card, null, 0, 0);
+	}
+	
+	public CardGUI(Card card, int x, int y) {
+		this(card, null, x, y);
 	}
 	
 	public void setImage(String newImgPath){
@@ -70,7 +88,15 @@ public class CardGUI extends JLabel {
 			ImageIcon imageIcon = new ImageIcon((Image) image);
 			Image scaledImage = imageIcon.getImage().getScaledInstance(this.getWidth(), this.getHeight(), Image.SCALE_SMOOTH);
 			this.setIcon(new ImageIcon(scaledImage));
+			
+			/*this.addMouseListener(new MouseAdapter(){
+				@Override
+				public void mouseClicked(MouseEvent e){
+					System.out.println("Parent selected");
+				}
+			});*/
 		}
+		
 	}
 	
 	public BufferedImage rotate(BufferedImage image, double angle) {
