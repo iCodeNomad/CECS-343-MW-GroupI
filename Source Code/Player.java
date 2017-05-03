@@ -6,6 +6,7 @@ public class Player {
 	private IlluminatiCard illuminati;
 	private ArrayList<GroupCard> groupCards;
 	private ArrayList<SpecialCard> specialCards;
+	private GUI gui;
 	
 	//Accessor Methods
 	public String Name(){
@@ -28,9 +29,19 @@ public class Player {
 		return specialCards.size();
 	}
 	
+	public GUI GUI(){
+		return this.gui;
+	}
+	
 	//Constructor Method
-	public Player(String name){
+	public Player(String name, GUI gui){
 		this.name = name;
+		this.gui = gui;
+		gui.player = this;
+		gui.initialize();
+		
+		gui.Frame().setVisible(true);
+		
 		groupCards = new ArrayList<GroupCard>();
 		specialCards = new ArrayList<SpecialCard>();
 	}
@@ -59,6 +70,7 @@ public class Player {
 		MainDeckCard card = deck.drawCard();
 		
 		if(card instanceof GroupCard){
+			//TODO - Change this so it doesn't add a group to the player's hand
 			groupCards.add((GroupCard) card);
 		}else{
 			specialCards.add((SpecialCard) card);

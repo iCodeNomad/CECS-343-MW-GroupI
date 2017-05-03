@@ -1,3 +1,4 @@
+import java.awt.EventQueue;
 import java.util.ArrayList;
 
 public class GamePlay {
@@ -5,15 +6,25 @@ public class GamePlay {
 	//Attributes - Attacking
 	private int attackModifier;
 	
+	private static GUI window;
+	
 	public static void main(String[] args) {
 		Deck deck = new Deck();
 		
-		//Test Die.roll()
-		for(int i = 0; i < 50; i++){
-			System.out.println(Die.roll());
-		}
+		/*EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					window = new GUI();
+					window.Frame().setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});*/
 		
-		//System.out.println(deck.toString());
+		window = new GUI();
+		
+		Player player = new Player("Tester", window);
 	}
 	
 	
@@ -22,14 +33,13 @@ public class GamePlay {
 	
 	//Call this method to start the attack
 	public void attack(Player attackingPlayer){
-		Global.AttackType attackType = PromptAttackType();
+		Global.AttackType attackType = attackingPlayer.GUI().AttackTypePopup();
 		StructureCard attackingGroup = PromptAttackingGroup();
 		GroupCard defendingGroup;
 		
 		ArrayList<GroupCard> aidingGroups;
 		
 		Global.Privilege privilege = Global.Privilege.NOT_PRIVILEGED;
-		
 		
 		//Select defending group, with checks based on attack type
 		if(attackType == Global.AttackType.CONTROL){
@@ -57,12 +67,14 @@ public class GamePlay {
 			//TODO - Add BFS to calculate attack modifier based on power structure position
 		}		
 		
-		//TODO - Calculate power structure's "Any Attempt" abilities
+		//Calculate "Any Attempt" Abilities
+		attackModifier += CalculateAnyAttempt(attackingPlayer, defendingGroup, attackType);
 		
 		//Check for Chinese Campaign Donors special ability
 		attackModifier += CheckChineseCampaignDonors(defendingGroup);
 		
-		//TODO - Add "Survivalists" ability
+		//Calculates "Survivalists" ability
+		attackModifier += CheckSurvivalistsAbility(defendingGroup.Owner());
 		
 		//TODO - Add groups to aid attack.
 		aidingGroups = PromptAidingGroups();
@@ -93,12 +105,6 @@ public class GamePlay {
 		
 	}
 	
-	private Global.AttackType PromptAttackType(){
-		//TODO - Add logic to display pop-up with the three attack options
-		//Return based on player's response.
-		return Global.AttackType.CONTROL;
-	}
-	
 	private StructureCard PromptAttackingGroup(){
 		//TODO - Add logic to select an attacking group based on cards in structure
 		return null;
@@ -122,8 +128,42 @@ public class GamePlay {
 		return null;
 	}
 	
+	private int CalculateAnyAttempt(Player attackingPlayer, GroupCard defendingGroup, Global.AttackType attackType){
+		int returnVal = 0;
+		
+		for(GroupCard card: attackingPlayer.GroupCards()){
+			for(BasicGroupAbility ability: card.Abilities()){
+				if(ability.AbilityType() == Global.AbilityType.ANY_ATTEMPT && (ability.AttackType() == attackType || ability.AttackType() == Global.AttackType.ALL)){
+					for(GroupCard.Alignment alignment: defendingGroup.Alignments()){
+						if(alignment == ability.Alignment()){
+							returnVal += ability.Amount();
+						}
+					}
+					
+					for(GroupCard targetGroup: ability.Groups()){
+						if(targetGroup == defendingGroup){
+							returnVal += ability.Amount();
+						}
+					}
+				}
+			}
+		}
+		
+		return returnVal;
+	}
+	
+	private int CheckSurvivalistsAbility(Player defendingPlayer){
+		for(GroupCard card: defendingPlayer.GroupCards()){
+			if(card.Name().equals("Survivalists")){
+				return -2;
+			}
+		}
+		
+		return 0;
+	}
+	
 	private int CheckChineseCampaignDonors(GroupCard defendingGroup){
-		//REMEMBER TO ADD CHECKS FOR DISCORDIAN SOCIETY
+		//TODO - REMEMBER TO ADD CHECKS FOR DISCORDIAN SOCIETY
 		if(defendingGroup.hasAlignment(GroupCard.Alignment.GOVERNMENT)){
 			return 4;
 		}

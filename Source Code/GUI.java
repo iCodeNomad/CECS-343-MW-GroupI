@@ -27,10 +27,7 @@ public class GUI {
 	private JFrame frame;
 	private JTextField chatTextField;
 	private JTextField textField;
-	private JTextField textField_1;
-	private JTextField textField_2;
-	private JTextField textField_3;
-	private JTextField textField_4;
+	//private JTextField textField_1;
 	
 	private FieldGUI gamePanel;
 	
@@ -40,42 +37,38 @@ public class GUI {
 	//Tracks the card selected in the player's hand
 	private CardGUI selectedCard;
 	
-	Player player;
-	JPanel cardsPanel;
+	//Tracks all CardGUI in gamePanel;
+	private ArrayList<CardGUI> gamePanelCards;
+	
+	//Tracks all CardGUI in cardsPanel
+	private ArrayList<CardGUI> cardsPanelCards;
+	
+	public Player player;
+	private JPanel cardsPanel;
 	
 	public CardGUI SelectedCard(){
 		return this.selectedCard;
 	}
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					GUI window = new GUI();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+	
+	public JFrame Frame(){
+		return this.frame;
 	}
-
 	
 	/**
 	 * Create the application.
 	 */
-	public GUI() {
-		initialize();
+	public GUI() {;
+		
 	}
 
 	
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	public void initialize() {
+		gamePanelCards = new ArrayList<CardGUI>();
+		cardsPanelCards = new ArrayList<CardGUI>();
+		
 		frame = new JFrame();
 		frame.setSize(1300, 800);
 		//frame.getBackground(red);
@@ -94,7 +87,7 @@ public class GUI {
 		panel.add(cardsPanel);
 		cardsPanel.setLayout(null);
 		
-		player = new Player("Joe");
+		//player = new Player("Joe");
 		Deck deck = new Deck();
 		player.SetIlluminati(deck.drawIlluminati());
 		
@@ -107,54 +100,9 @@ public class GUI {
 		panel.add(gamePanel);
 		gamePanel.setLayout(null);
 		
-		//-----------------------------FOR TESTING PURPOSES---------------------------------------
+		gamePanelCards.add(illuminatiGUI);
 		
-		GenerateHand(player, cardsPanel);
-		
-		/*final String IMAGE_PATH = "./src/img/";
-		
-		BasicGroupAbility ability;
-		ArrayList<GroupCard.Arrow> outwardArrows;
-		GroupCard groupCard;
-		ArrayList<GroupCard.Alignment> alignments;
-		
-		//American Autoduel Association
-		outwardArrows = new ArrayList<GroupCard.Arrow>();
-		outwardArrows.add(GroupCard.Arrow.RIGHT);
-		alignments = new ArrayList<GroupCard.Alignment>();
-		alignments.add(GroupCard.Alignment.VIOLENT);
-		alignments.add(GroupCard.Alignment.WEIRD);
-		groupCard = new GroupCard("American Autoduel Association", 1, 0, 5, 1, IMAGE_PATH + "AmericanAutoduelAssociation.png", GroupCard.Arrow.LEFT, outwardArrows, alignments);				
-		
-		//Add American Autoduel Association
-				player.Illuminati().AddChild(groupCard, IlluminatiCard.Arrow.RIGHT);
-				gamePanel.addCard(new CardGUI(groupCard, gamePanel, 0, 0), new CardGUI(player.Illuminati(), gamePanel, 0, 0));
-				
-		//Nuclear Power Companies
-		outwardArrows = new ArrayList<GroupCard.Arrow>();
-		outwardArrows.add(GroupCard.Arrow.LEFT);
-		GroupCard groupCard2 = new GroupCard("Nuclear Power Companies", 4, 0, 4, 3, IMAGE_PATH + "NuclearPowerCompanies.png", GroupCard.Arrow.RIGHT, outwardArrows, GroupCard.Alignment.CONSERVATIVE);				
-		
-		
-		//Add Nuclear Power Companies
-		groupCard.AddChild(groupCard2, StructureCard.Arrow.RIGHT);
-		gamePanel.addCard(new CardGUI(groupCard2, gamePanel, 0, 0), new CardGUI(groupCard, gamePanel, 0, 0));
-		
-		//Big Media
-		outwardArrows = new ArrayList<GroupCard.Arrow>();
-		outwardArrows.add(GroupCard.Arrow.TOP);
-		outwardArrows.add(GroupCard.Arrow.LEFT);
-		outwardArrows.add(GroupCard.Arrow.BOTTOM);
-		alignments = new ArrayList<GroupCard.Alignment>();
-		alignments.add(GroupCard.Alignment.LIBERAL);
-		alignments.add(GroupCard.Alignment.STRAIGHT);
-		GroupCard groupCard3 = new GroupCard("Big Media", 4, 3, 6, 3, IMAGE_PATH + "BigMedia.png", GroupCard.Arrow.RIGHT, outwardArrows, alignments);				
-		
-		//Add Big Media
-		player.Illuminati().AddChild(groupCard3, IlluminatiCard.Arrow.TOP);
-		gamePanel.addCard(new CardGUI(groupCard3, gamePanel, 0, 0), new CardGUI(player.Illuminati(), gamePanel, 0, 0));
-		*/
-		//--------------------------------------END TESTING--------------------------------------------
+		//GenerateHand(player, cardsPanel);
 		
 		//Add the deck to the field
 		JLabel fieldDeck = new JLabel("");
@@ -177,28 +125,7 @@ public class GUI {
 		textField_1.setBackground(UIManager.getColor("Button.select"));
 		textField_1.setBounds(470, 402, 35, 26);
 		gamePanel.add(textField_1);
-		textField_1.setColumns(10);
-		
-		textField_2 = new JTextField();
-		textField_2.setText("$30");
-		textField_2.setColumns(10);
-		textField_2.setBackground(UIManager.getColor("Button.select"));
-		textField_2.setBounds(769, 388, 35, 26);
-		gamePanel.add(textField_2);
-		
-		textField_3 = new JTextField();
-		textField_3.setText("$0");
-		textField_3.setColumns(10);
-		textField_3.setBackground(UIManager.getColor("Button.select"));
-		textField_3.setBounds(757, 184, 35, 26);
-		gamePanel.add(textField_3);
-		
-		textField_4 = new JTextField();
-		textField_4.setText("$10");
-		textField_4.setColumns(10);
-		textField_4.setBackground(UIManager.getColor("Button.select"));
-		textField_4.setBounds(515, 140, 35, 26);
-		gamePanel.add(textField_4);*/
+		textField_1.setColumns(10);*/
 		
 		JPanel rightSidePanel = new JPanel();
 		rightSidePanel.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -316,6 +243,8 @@ public class GUI {
 		ArrayList<GroupCard> groups = player.GroupCards();
 		ArrayList<SpecialCard> specials = player.SpecialCards();
 		
+		cardsPanelCards = new ArrayList<CardGUI>();
+		
 		int xOffset = 4;
 		
 		for(Card card: groups){
@@ -331,34 +260,92 @@ public class GUI {
 				}
 			});
 			panel.add(cardGUI);
+			cardsPanelCards.add(cardGUI);
 			
 			xOffset += 154;
 		}
 		for(Card card: specials){
 			CardGUI cardGUI = new CardGUI(card, panel, xOffset, 10);
 			panel.add(cardGUI);
+			cardsPanelCards.add(cardGUI);
 			
 			xOffset += 154;
 		}
 	}
 	
+	private CardGUI addChild(StructureCard parent, StructureCard child, StructureCard.Arrow arrow){
+		parent.AddChild((GroupCard) child, arrow);
+		CardGUI childGUI = new CardGUI(child, gamePanel, 0, 0);
+		gamePanel.addCard(childGUI, new CardGUI(parent, gamePanel, 0, 0));
+		gamePanelCards.add(childGUI);
+		
+		return childGUI;
+	}
+	
+	private void addEventHandler(CardGUI card){
+		card.addMouseListener(new MouseAdapter(){
+			@Override
+			public void mouseClicked(MouseEvent e){
+				if(Global.selectionPhase == Global.SelectionPhase.ADD_CHILD){
+					parentControlArrowPopup((StructureCard) card.Card());
+				}
+			}
+		});
+	}
+	
+	//--------------------------------------Prompts/Popups--------------------------------------
+	
+	//Variables for Listeners
+	private Global.AttackType listAttackType;
+	
+	private JFrame CreateGenericPopup(){
+		JFrame popup = new JFrame();
+		popup.setUndecorated(true);
+		popup.setSize(300, 500);
+		popup.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		popup.getContentPane().setLayout(new BorderLayout(0, 0));
+		popup.repaint();
+		
+		popup.setVisible(true);
+		popup.setAlwaysOnTop(true);
+		
+		return popup;
+	}
+	
+	private JPanel CreateGenericPanel(){
+		JPanel popupPanel = new JPanel();
+		popupPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
+		popupPanel.setBounds(0, 0, 300, 500);
+		
+		popupPanel.setLayout(null);
+		
+		return popupPanel;
+	}
+	
+	private JButton CreateCancelButton(JFrame popup, int yOffset){
+		JButton btnCancel = new JButton("Cancel");
+		btnCancel.setBounds(new Rectangle(200, yOffset, 80, 30));
+		
+		btnCancel.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				popup.setVisible(false);
+				popup.dispose();
+			}
+		});
+		
+		return btnCancel;
+	}
+	
+	private JButton CreateCancelButton(JFrame popup){
+		return CreateCancelButton(popup, 450);
+	}
+	
 	public void parentControlArrowPopup(StructureCard parent){
 		if(selectedCard != null){
-			JFrame popup = new JFrame();
-			popup.setUndecorated(true);
-			popup.setSize(300, 500);
-			popup.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			popup.getContentPane().setLayout(new BorderLayout(0, 0));
-			popup.repaint();
+			JFrame popup = CreateGenericPopup();
 			
-			popup.setVisible(true);
-			popup.setAlwaysOnTop(true);
-			
-			JPanel popupPanel = new JPanel();
-			popupPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-			popupPanel.setBounds(0, 0, 300, 500);
+			JPanel popupPanel = CreateGenericPanel();
 			popup.add(popupPanel);
-			popupPanel.setLayout(null);
 			
 			ArrayList<JButton> buttons = new ArrayList<JButton>();
 			
@@ -393,19 +380,77 @@ public class GUI {
 			
 			yOffset += 50;
 			
-			JButton btnCancel = new JButton("Cancel");
-			btnCancel.setBounds(new Rectangle(200, yOffset, 80, 30));
+			JButton btnCancel = CreateCancelButton(popup);
 			popupPanel.add(btnCancel);
-			btnCancel.addActionListener(new ActionListener(){
-				public void actionPerformed(ActionEvent e){
-					popup.setVisible(false);
-					popup.dispose();
-				}
-			});
 			
 			frame.repaint();
 		}
 	}
+	
+	public Global.AttackType AttackTypePopup(){
+		listAttackType = null;
+		
+		JFrame popup = CreateGenericPopup();
+		
+		JPanel popupPanel = CreateGenericPanel();
+		popup.add(popupPanel);
+		
+		JLabel title = new JLabel("Pick an attack type:");
+		title.setBounds(100, 30, 300, 16);
+		popupPanel.add(title);
+		
+		JButton btnControl = new JButton("Control");
+		btnControl.setBounds(new Rectangle(10, 60, 280, 30));
+		popupPanel.add(btnControl);
+		btnControl.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				listAttackType = Global.AttackType.CONTROL;
+				popup.setVisible(false);
+				popup.dispose();
+			}
+		});
+		
+		JButton btnNeutralize = new JButton("Neutralize");
+		btnNeutralize.setBounds(new Rectangle(10, 100, 280, 30));
+		popupPanel.add(btnNeutralize);
+		btnNeutralize.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				listAttackType = Global.AttackType.NEUTRALIZE;
+				popup.setVisible(false);
+				popup.dispose();
+			}
+		});
+		
+		JButton btnDestroy = new JButton("Destroy");
+		btnDestroy.setBounds(new Rectangle(10, 140, 280, 30));
+		popupPanel.add(btnDestroy);
+		btnDestroy.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				listAttackType = Global.AttackType.DESTROY;
+				popup.setVisible(false);
+				popup.dispose();
+			}
+		});
+		
+		JButton btnCancel = CreateCancelButton(popup);
+		popupPanel.add(btnCancel);
+		
+		while(popup.isVisible()){
+			try{
+				Thread.sleep(200);
+			}catch (Exception e){}
+		}
+		
+		frame.repaint();
+		System.out.println("METHOD: " + listAttackType);
+		if(listAttackType == null){
+			return null;
+		}else{
+			return listAttackType;
+		}
+	}
+	
+	//------------------------------------------Action Listeners-------------------------------------
 	
 	private class ArrowButtonListener implements ActionListener{
 		private StructureCard.Arrow arrow;
@@ -430,8 +475,9 @@ public class GUI {
 			child.addMouseListener(new MouseAdapter(){
 				@Override
 				public void mouseClicked(MouseEvent e){
-					System.out.println("Child selected");
-					parentControlArrowPopup((StructureCard) child.Card());
+					if(Global.selectionPhase == Global.SelectionPhase.ADD_CHILD){
+						parentControlArrowPopup((StructureCard) child.Card());
+					}
 					//selectedCard = null;
 				}
 			});
@@ -439,22 +485,5 @@ public class GUI {
 			popup.setVisible(false);
 			popup.dispose();
 		}
-	}
-	
-	private CardGUI addChild(StructureCard parent, StructureCard child, StructureCard.Arrow arrow){
-		parent.AddChild((GroupCard) child, arrow);
-		CardGUI childGUI = new CardGUI(child, gamePanel, 0, 0);
-		gamePanel.addCard(childGUI, new CardGUI(parent, gamePanel, 0, 0));
-		return childGUI;
-	}
-	
-	private void addEventHandler(CardGUI card){
-		card.addMouseListener(new MouseAdapter(){
-			@Override
-			public void mouseClicked(MouseEvent e){
-				parentControlArrowPopup((StructureCard) card.Card());
-				System.out.println("Parent selected");
-			}
-		});
 	}
 }

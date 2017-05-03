@@ -6,13 +6,33 @@ import java.util.ArrayList;
 
 public class BasicGroupAbility{
 	
-	public Global.AbilityType abilityType;
-	public ArrayList<GroupCard> groups;
-	public Global.AttackType attackType;
-	public GroupCard.Alignment alignment;
-	public int amount;
+	private Global.AbilityType abilityType;
+	private ArrayList<GroupCard> groups;
+	private Global.AttackType attackType;
+	private GroupCard.Alignment alignment;
+	private int amount;
 	
 	
+	public Global.AbilityType AbilityType() {
+		return abilityType;
+	}
+
+	public ArrayList<GroupCard> Groups() {
+		return groups;
+	}
+
+	public Global.AttackType AttackType() {
+		return attackType;
+	}
+
+	public GroupCard.Alignment Alignment() {
+		return alignment;
+	}
+
+	public int Amount() {
+		return amount;
+	}
+
 	//Constructors
 	public BasicGroupAbility(Global.AbilityType abilityType, Global.AttackType attackType, int amount){
 		this.abilityType = abilityType;

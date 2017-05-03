@@ -189,15 +189,15 @@ public class GroupCard extends StructureCard implements MainDeckCard{
 		//CHANGE ME TO USE hasAlignment
 		
 		for(BasicGroupAbility i: this.abilities){
-			if (i.abilityType == Global.AbilityType.DIRECT_CONTROL && attackType == Global.AttackType.CONTROL){
-				for(GroupCard j: i.groups){
+			if (i.AbilityType() == Global.AbilityType.DIRECT_CONTROL && attackType == Global.AttackType.CONTROL){
+				for(GroupCard j: i.Groups()){
 					if(j == defendingGroup){
-						return i.amount;
+						return i.Amount();
 					}
 				}
 				
-				if(defendingGroup.hasAlignment(i.alignment)){
-					return i.amount;
+				if(defendingGroup.hasAlignment(i.Alignment())){
+					return i.Amount();
 				}
 			}
 		}

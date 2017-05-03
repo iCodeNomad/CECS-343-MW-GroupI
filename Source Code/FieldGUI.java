@@ -102,12 +102,10 @@ public class FieldGUI extends JPanel {
 					}
 				}else{
 					if(angle == 0){
-						//cards.put(child, new Rectangle(x - 1, y + 5, 5, 3));
 						cards.put(child, new Rectangle(x + 3, y + 1, 5, 3));
 					}else if (angle == 90){
 						cards.put(child, new Rectangle(x - 5, y + 1, 5, 3));
 					}else if (angle == 180){
-						//cards.put(child, new Rectangle(x - 1, y - 3, 5, 3));
 						cards.put(child, new Rectangle(x + 3, y + 1, 5, 3));
 					}else{
 						cards.put(child, new Rectangle(x - 5, y - 1, 5, 3));
@@ -118,26 +116,26 @@ public class FieldGUI extends JPanel {
 					if(angle == 0){
 						cards.put(child, new Rectangle(x + 1, y + 3, 3, 5));
 					}else if (angle == 90){
-						cards.put(child, new Rectangle(x - 3, y - 1, 5, 3));
+						cards.put(child, new Rectangle(x - 3, y - 1, 3, 5));
 					}else if (angle == 180){
-						cards.put(child, new Rectangle(x + 1, y - 5, 5, 3));
+						cards.put(child, new Rectangle(x + 1, y - 5, 3, 5));
 					}else{
-						cards.put(child, new Rectangle(x + 5, y - 1, 5, 3));
+						cards.put(child, new Rectangle(x + 5, y - 1, 3, 5));
 					}
 				}else{
 					if(angle == 0){
 						cards.put(child, new Rectangle(x, y + 5, 3, 5));
 					}else if (angle == 90){
-						cards.put(child, new Rectangle(x - 3, y, 5, 3));
+						cards.put(child, new Rectangle(x - 3, y, 3, 5));
 					}else if (angle == 180){
-						cards.put(child, new Rectangle(x, y - 5, 5, 3));
+						cards.put(child, new Rectangle(x, y - 5, 3, 5));
 					}else{
-						cards.put(child, new Rectangle(x + 3, y, 5, 3));
+						cards.put(child, new Rectangle(x + 3, y, 3, 5));
 					}
 				}
 			}
 			
-			System.out.println(cards.get(child));
+			//System.out.println(cards.get(child));
 		}
 		
 		displayCards();

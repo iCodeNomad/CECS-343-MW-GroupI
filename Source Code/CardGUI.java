@@ -88,13 +88,6 @@ public class CardGUI extends JLabel {
 			ImageIcon imageIcon = new ImageIcon((Image) image);
 			Image scaledImage = imageIcon.getImage().getScaledInstance(this.getWidth(), this.getHeight(), Image.SCALE_SMOOTH);
 			this.setIcon(new ImageIcon(scaledImage));
-			
-			/*this.addMouseListener(new MouseAdapter(){
-				@Override
-				public void mouseClicked(MouseEvent e){
-					System.out.println("Parent selected");
-				}
-			});*/
 		}
 		
 	}
