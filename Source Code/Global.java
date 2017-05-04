@@ -18,6 +18,6 @@ public class Global {
 	}
 	
 	public enum SelectionPhase{
-		NONE, ADD_CHILD;
+		NONE, ADD_CHILD, SELECT_ATTACKING_GROUP;
 	}
 }

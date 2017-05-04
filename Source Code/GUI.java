@@ -46,6 +46,9 @@ public class GUI {
 	public Player player;
 	private JPanel cardsPanel;
 	
+	//Text prompt in the upper-left corner
+	private JLabel cornerPrompt;
+	
 	public CardGUI SelectedCard(){
 		return this.selectedCard;
 	}
@@ -288,9 +291,26 @@ public class GUI {
 			public void mouseClicked(MouseEvent e){
 				if(Global.selectionPhase == Global.SelectionPhase.ADD_CHILD){
 					parentControlArrowPopup((StructureCard) card.Card());
+				}else if(Global.selectionPhase == Global.SelectionPhase.SELECT_ATTACKING_GROUP){
+					designateAttackingGroup((StructureCard) card.Card());
 				}
 			}
 		});
+	}
+	
+	//-------------------------------------Card Selection Effects-------------------------------
+	
+	private void designateAttackingGroup(StructureCard card){
+		if(card.AttackCounter() > 0){
+			if(card.Power() == 0){
+				DialogBox("This group has no power and cannot attack!");
+			}else{
+				GamePlay.attackingGroup = card;
+				Global.selectionPhase = Global.SelectionPhase.NONE;
+			}
+		}else{
+			DialogBox("This group has no attacks remaining!");
+		}
 	}
 	
 	//--------------------------------------Prompts/Popups--------------------------------------
@@ -298,10 +318,29 @@ public class GUI {
 	//Variables for Listeners
 	private Global.AttackType listAttackType;
 	
+	//Creates a label in the top left corner of the game field, to prompt the user to do something
+	public void createPrompt(String s){
+		cornerPrompt = new JLabel(s);
+		cornerPrompt.setBounds(6, 6, 500, 25);
+		cornerPrompt.setFont(cornerPrompt.getFont().deriveFont(20.0f));
+		cornerPrompt.setForeground(new Color(255, 50, 50));
+		gamePanel.add(cornerPrompt);
+	}
+	
+	//Removes the label in the top left corner
+	public void removePrompt(){
+		cornerPrompt.setVisible(false);
+		cornerPrompt = null;
+	}
+	
 	private JFrame CreateGenericPopup(){
+		return CreateGenericPopup(300, 500);
+	}
+	
+	private JFrame CreateGenericPopup(int width, int height){
 		JFrame popup = new JFrame();
 		popup.setUndecorated(true);
-		popup.setSize(300, 500);
+		popup.setSize(width, height);
 		popup.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		popup.getContentPane().setLayout(new BorderLayout(0, 0));
 		popup.repaint();
@@ -313,9 +352,13 @@ public class GUI {
 	}
 	
 	private JPanel CreateGenericPanel(){
+		return CreateGenericPanel(300, 500);
+	}
+	
+	private JPanel CreateGenericPanel(int width, int height){
 		JPanel popupPanel = new JPanel();
 		popupPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		popupPanel.setBounds(0, 0, 300, 500);
+		popupPanel.setBounds(0, 0, width, height);
 		
 		popupPanel.setLayout(null);
 		
@@ -338,6 +381,30 @@ public class GUI {
 	
 	private JButton CreateCancelButton(JFrame popup){
 		return CreateCancelButton(popup, 450);
+	}
+	
+	//Creates a simple dialog box to display a string to the player.
+	public void DialogBox(String s){
+		JFrame frame = CreateGenericPopup(300, 200);
+		JPanel panel = CreateGenericPanel(300, 200);
+
+		frame.add(panel);
+		
+		JButton btnOK = new JButton("OK");
+		btnOK.setBounds(new Rectangle(135, 150, 90, 30));
+		
+		btnOK.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				frame.setVisible(false);
+				frame.dispose();
+			}
+		});
+		
+		panel.add(btnOK);
+		
+		JLabel title = new JLabel(s);
+		title.setBounds(20, 20, 300, 130);
+		panel.add(title);
 	}
 	
 	public void parentControlArrowPopup(StructureCard parent){

@@ -5,8 +5,17 @@ public class GamePlay {
 	
 	//Attributes - Attacking
 	private int attackModifier;
-	
+	public static StructureCard attackingGroup;
+
 	private static GUI window;
+	
+	/*public StructureCard AttackingGroup() {
+		return attackingGroup;
+	}
+
+	public void setAttackingGroup(StructureCard attackingGroup) {
+		this.attackingGroup = attackingGroup;
+	}*/
 	
 	public static void main(String[] args) {
 		Deck deck = new Deck();
@@ -25,6 +34,8 @@ public class GamePlay {
 		window = new GUI();
 		
 		Player player = new Player("Tester", window);
+		
+		window.DialogBox("Hello there! This is an invalid group!");
 	}
 	
 	
@@ -34,7 +45,7 @@ public class GamePlay {
 	//Call this method to start the attack
 	public void attack(Player attackingPlayer){
 		Global.AttackType attackType = attackingPlayer.GUI().AttackTypePopup();
-		StructureCard attackingGroup = PromptAttackingGroup();
+		StructureCard attackingGroup = PromptAttackingGroup(attackingPlayer.GUI());
 		GroupCard defendingGroup;
 		
 		ArrayList<GroupCard> aidingGroups;
@@ -105,8 +116,21 @@ public class GamePlay {
 		
 	}
 	
-	private StructureCard PromptAttackingGroup(){
-		//TODO - Add logic to select an attacking group based on cards in structure
+	private StructureCard PromptAttackingGroup(GUI gui){
+		gui.createPrompt("Please select an attacking group:");
+		
+		Global.selectionPhase = Global.SelectionPhase.SELECT_ATTACKING_GROUP;
+		
+		while(Global.selectionPhase == Global.SelectionPhase.SELECT_ATTACKING_GROUP){
+			try{
+				Thread.sleep(200);
+			}catch(Exception e){}
+		}
+		
+		//TODO - Reprompt for attacking group is invalid
+		//Add option to cancel attack altogether
+		
+		gui.removePrompt();
 		return null;
 	}
 	
