@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class GroupCard extends StructureCard implements MainDeckCard{
 	
@@ -11,6 +13,9 @@ public class GroupCard extends StructureCard implements MainDeckCard{
 	protected StructureCard parent;
 	protected StructureCard.Arrow parentArrow;
 	protected int resistance;
+	
+	//Parent variable for breadth-first search
+	protected StructureCard BSDparent;
 	
 	//BasicGroupAbility needs to be in an array list because one card has two different abilities with different amounts.
 	protected ArrayList<BasicGroupAbility> abilities;
@@ -34,6 +39,14 @@ public class GroupCard extends StructureCard implements MainDeckCard{
 	
 	public StructureCard.Arrow ParentArrow(){
 		return this.parentArrow;
+	}
+
+	public StructureCard BSDparent() {
+		return BSDparent;
+	}
+
+	public void setBSDparent(StructureCard BSDparent) {
+		this.BSDparent = BSDparent;
 	}
 
 	//Constructor Methods
@@ -224,16 +237,74 @@ public class GroupCard extends StructureCard implements MainDeckCard{
 		}
 		return false;
 	}
+	
+	public int CalculateStructureResistance(){
+		StructureCard currentCard;
+		GroupCard child;
+		ArrayList<GroupCard> children;
+		
+		Queue<StructureCard> q = new LinkedList<StructureCard>();
+		q.add(this.owner.Illuminati());
+		
+		
+		while(q.size() != 0){
+			currentCard = q.remove();
+			children = new ArrayList<GroupCard>(currentCard.Children().values());
+			
+			for(int i = 0; i < children.size(); i++){
+				child = children.get(i);
+				
+				if(child.BSDparent() == null){
+					q.add(child);
+					child.setBSDparent(currentCard);
+					child.setDistanceFromIlluminati(currentCard.DistanceFromIlluminati());
+					
+					if(child == this){
+						if(child.DistanceFromIlluminati() == 1){
+							return -10;
+						}else if(child.DistanceFromIlluminati() == 2){
+							return -5;
+						}else if(child.DistanceFromIlluminati() == 3){
+							return -2;
+						}else{
+							return 0;
+						}
+					}
+				}
+			}
+		}
+		
+		return 0;
+		
+		/*node = G.findNode(n);
+    node.Parent = -1;
+    node.Length = 0;
+    q = Queue();
+    q.enqueue(node);
+    while q.size() ~= 0 
+        node = q.dequeue();
+        for i = 1:length(node.Adj)
+            adjNode = G.findNode(node.Adj(i));
 
-	@Override
+            if isempty(adjNode.Parent)
+                q.enqueue(adjNode);
+                adjNode.Parent = node;
+                adjNode.Length = node.Length + 1;
+            end
+        end
+    end*/
+	}
+
+	/*@Override
 	public String toString() {
 		return "GroupCard [alignments=" + alignments + ", parent=" + parent + ", parentArrow=" + parentArrow
-				+ ", resistance=" + resistance + ", abilities=" + abilities + ", power=" + power
-				+ ", transferablePower=" + transferablePower + ", income=" + income + ", inwardArrow=" + inwardArrow
-				+ ", outwardArrows=" + outwardArrows + ", children=" + children + ", owner=" + owner
+				+ ", resistance=" + resistance + ", BSDparent=" + BSDparent + ", abilities=" + abilities + ", power="
+				+ power + ", transferablePower=" + transferablePower + ", income=" + income + ", inwardArrow="
+				+ inwardArrow + ", outwardArrows=" + outwardArrows + ", children=" + children + ", owner=" + owner
 				+ ", attackCounter=" + attackCounter + ", currentMoney=" + currentMoney + ", rotation=" + rotation
-				+ ", name=" + name + ", imagePath=" + imagePath + "]";
-	}
+				+ ", distanceFromIlluminati=" + distanceFromIlluminati + ", name=" + name + ", imagePath=" + imagePath
+				+ "]";
+	}*/
 	
 	
 }

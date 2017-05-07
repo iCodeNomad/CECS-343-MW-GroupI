@@ -21,6 +21,7 @@ public abstract class StructureCard extends Card{
 	protected int attackCounter;
 	protected int currentMoney;
 	protected Rotation rotation;
+	protected int distanceFromIlluminati;
 	
 	//Accessor Methods
 	
@@ -68,6 +69,24 @@ public abstract class StructureCard extends Card{
 		return this.rotation;
 	}
 	
+	public int DistanceFromIlluminati() {
+		return distanceFromIlluminati;
+	}
+
+	public void setDistanceFromIlluminati(int distanceFromIlluminati) {
+		this.distanceFromIlluminati = distanceFromIlluminati;
+	}
+	
+	public void addMoney(int amount){
+		currentMoney += amount;
+	}
+	
+	public void removeMoney(int amount){
+		if((currentMoney - amount) >= 0){
+			currentMoney -= amount;
+		}
+	}
+
 	//Constructor Method
 	public StructureCard(String name, int power, int transferablePower, int income, String imagePath,
 						  Arrow inwardArrow){
@@ -77,6 +96,8 @@ public abstract class StructureCard extends Card{
 		this.transferablePower = transferablePower;
 		this.income = income;
 		this.inwardArrow = inwardArrow;
+		
+		distanceFromIlluminati = 0;
 	}
 	
 	
@@ -143,10 +164,8 @@ public abstract class StructureCard extends Card{
 	}
 
 	@Override
-	public String toString() {
-		return "StructureCard [name=" + name + ", power=" + power + ", transferablePower=" + transferablePower
-				+ ", income=" + income + ", imagePath=" + imagePath + ", inwardArrow=" + inwardArrow
-				+ ", outwardArrows=" + outwardArrows + ", children=" + children + "]" + System.getProperty("line.separator");
+	public String toString(){
+		return this.Name();
 	}
 	
 	

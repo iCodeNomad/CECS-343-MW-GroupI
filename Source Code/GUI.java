@@ -16,9 +16,11 @@ import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 
@@ -34,8 +36,8 @@ public class GUI {
 	//Used to pass an arrow to the mouse handler in the popup
 	private StructureCard.Arrow actionArrow;
 	
-	//Tracks the card selected in the player's hand
-	private CardGUI selectedCard;
+	//Tracks the cards selected in the player's hand
+	private ArrayList<CardGUI> selectedCards;
 	
 	//Tracks all CardGUI in gamePanel;
 	private ArrayList<CardGUI> gamePanelCards;
@@ -49,8 +51,11 @@ public class GUI {
 	//Text prompt in the upper-left corner
 	private JLabel cornerPrompt;
 	
-	public CardGUI SelectedCard(){
-		return this.selectedCard;
+	//Text prompt for attack modifier in upper-right corner
+	private JLabel modifierPrompt;
+	
+	public ArrayList<CardGUI> SelectedCards(){
+		return this.selectedCards;
 	}
 	
 	public JFrame Frame(){
@@ -206,6 +211,22 @@ public class GUI {
 		JButton btnAttack_1 = new JButton("Attack");
 		btnAttack_1.setBounds(11, 38, 130, 29);
 		playerActionsPanel.add(btnAttack_1);
+		btnAttack_1.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent e) {
+				SwingUtilities.invokeLater(new Runnable(){
+					public void run(){
+						Thread qthread = new Thread(){
+							public void run(){
+								GamePlay.attack(player);
+							}
+						};
+						
+						qthread.start();
+					}
+				});
+			}
+		});
 		
 		JButton btnUseASpecial = new JButton("Use a Specialty ");
 		btnUseASpecial.setBounds(10, 96, 130, 29);
@@ -240,13 +261,14 @@ public class GUI {
 		});
 	}
 	
-	private void GenerateHand(Player player, JPanel panel){
+	public void GenerateHand(Player player, JPanel panel){
 		panel.removeAll();
 		panel.updateUI();
 		ArrayList<GroupCard> groups = player.GroupCards();
 		ArrayList<SpecialCard> specials = player.SpecialCards();
 		
 		cardsPanelCards = new ArrayList<CardGUI>();
+		selectedCards = new ArrayList<CardGUI>();
 		
 		int xOffset = 4;
 		
@@ -255,10 +277,10 @@ public class GUI {
 			cardGUI.addMouseListener(new MouseAdapter(){
 				@Override
 				public void mouseClicked(MouseEvent e){
-					if(selectedCard != cardGUI){
-						selectedCard = cardGUI;
+					if(!selectedCards.contains(cardGUI)){
+						selectedCards.add(cardGUI);
 					}else{
-						selectedCard = null;
+						selectedCards.remove(cardGUI);
 					}
 				}
 			});
@@ -269,11 +291,23 @@ public class GUI {
 		}
 		for(Card card: specials){
 			CardGUI cardGUI = new CardGUI(card, panel, xOffset, 10);
+			cardGUI.addMouseListener(new MouseAdapter(){
+				@Override
+				public void mouseClicked(MouseEvent e){
+					if(Global.selectionPhase == Global.SelectionPhase.PRIVILEGE_DISCARD){
+						selectedCards = new ArrayList<CardGUI>();
+						designateSpecialForPrivilege(cardGUI);
+					}
+				}
+			});
+			
 			panel.add(cardGUI);
 			cardsPanelCards.add(cardGUI);
 			
 			xOffset += 154;
 		}
+		
+		frame.repaint();
 	}
 	
 	private CardGUI addChild(StructureCard parent, StructureCard child, StructureCard.Arrow arrow){
@@ -293,6 +327,8 @@ public class GUI {
 					parentControlArrowPopup((StructureCard) card.Card());
 				}else if(Global.selectionPhase == Global.SelectionPhase.SELECT_ATTACKING_GROUP){
 					designateAttackingGroup((StructureCard) card.Card());
+				}else if(Global.selectionPhase == Global.SelectionPhase.SELECT_AIDING_GROUPS){
+					designateAidingGroup((StructureCard) card.Card());
 				}
 			}
 		});
@@ -311,6 +347,37 @@ public class GUI {
 		}else{
 			DialogBox("This group has no attacks remaining!");
 		}
+	}
+	
+	private void designateAidingGroup(StructureCard card){
+		if(card == GamePlay.attackingGroup){
+			DialogBox("The attacking group cannot assist itself!");
+			return;
+		}
+		
+		if(card.AttackCounter() > 0){
+			if(card.TransferablePower() == 0){
+				DialogBox("This group has no transferable power and cannot aid in the attack!");
+			}else{
+				if(GamePlay.aidingGroups.contains(card)){
+					GamePlay.aidingGroups.remove(card);
+					System.out.println(GamePlay.aidingGroups);
+				}else{
+					GamePlay.aidingGroups.add(card);
+					System.out.println(GamePlay.aidingGroups);
+				}
+			}
+		}else{
+			DialogBox("This group has no attacks remaining!");
+		}
+	}
+	
+	private void designateSpecialForPrivilege(CardGUI cardGUI){
+		if(selectedCards.size() > 0){
+			selectedCards.remove(0);
+		}
+			
+		selectedCards.add(cardGUI);
 	}
 	
 	//--------------------------------------Prompts/Popups--------------------------------------
@@ -385,30 +452,11 @@ public class GUI {
 	
 	//Creates a simple dialog box to display a string to the player.
 	public void DialogBox(String s){
-		JFrame frame = CreateGenericPopup(300, 200);
-		JPanel panel = CreateGenericPanel(300, 200);
-
-		frame.add(panel);
-		
-		JButton btnOK = new JButton("OK");
-		btnOK.setBounds(new Rectangle(135, 150, 90, 30));
-		
-		btnOK.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				frame.setVisible(false);
-				frame.dispose();
-			}
-		});
-		
-		panel.add(btnOK);
-		
-		JLabel title = new JLabel(s);
-		title.setBounds(20, 20, 300, 130);
-		panel.add(title);
+		JOptionPane.showMessageDialog(null, "<html><body style = 'width: 250 px'>" + s);
 	}
 	
 	public void parentControlArrowPopup(StructureCard parent){
-		if(selectedCard != null){
+		if(selectedCards.size() > 0){
 			JFrame popup = CreateGenericPopup();
 			
 			JPanel popupPanel = CreateGenericPanel();
@@ -455,6 +503,7 @@ public class GUI {
 	}
 	
 	public Global.AttackType AttackTypePopup(){
+		
 		listAttackType = null;
 		
 		JFrame popup = CreateGenericPopup();
@@ -469,6 +518,7 @@ public class GUI {
 		JButton btnControl = new JButton("Control");
 		btnControl.setBounds(new Rectangle(10, 60, 280, 30));
 		popupPanel.add(btnControl);
+		btnControl.setVisible(true);
 		btnControl.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				listAttackType = Global.AttackType.CONTROL;
@@ -480,6 +530,7 @@ public class GUI {
 		JButton btnNeutralize = new JButton("Neutralize");
 		btnNeutralize.setBounds(new Rectangle(10, 100, 280, 30));
 		popupPanel.add(btnNeutralize);
+		btnNeutralize.setVisible(true);
 		btnNeutralize.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				listAttackType = Global.AttackType.NEUTRALIZE;
@@ -501,6 +552,11 @@ public class GUI {
 		
 		JButton btnCancel = CreateCancelButton(popup);
 		popupPanel.add(btnCancel);
+		btnDestroy.setVisible(true);
+		
+		frame.repaint();
+		popupPanel.repaint();
+		
 		
 		while(popup.isVisible()){
 			try{
@@ -508,8 +564,6 @@ public class GUI {
 			}catch (Exception e){}
 		}
 		
-		frame.repaint();
-		System.out.println("METHOD: " + listAttackType);
 		if(listAttackType == null){
 			return null;
 		}else{
@@ -532,10 +586,10 @@ public class GUI {
 		
 		public void actionPerformed(ActionEvent e){
 			System.out.println(arrow);
-			CardGUI child = addChild(parent, (GroupCard) selectedCard.Card(), arrow);
+			CardGUI child = addChild(parent, (GroupCard) selectedCards.get(0).Card(), arrow);
 			
 			//Will be unnecessary, simply for basic playability
-			player.RemoveGroupCard((GroupCard) selectedCard.Card());
+			player.RemoveGroupCard((GroupCard) selectedCards.get(0).Card());
 			GenerateHand(player, cardsPanel);
 			//End unnecessary parts
 			
@@ -544,13 +598,77 @@ public class GUI {
 				public void mouseClicked(MouseEvent e){
 					if(Global.selectionPhase == Global.SelectionPhase.ADD_CHILD){
 						parentControlArrowPopup((StructureCard) child.Card());
+					}else if(Global.selectionPhase == Global.SelectionPhase.SELECT_ATTACKING_GROUP){
+						designateAttackingGroup((StructureCard) child.Card());
+					}else if(Global.selectionPhase == Global.SelectionPhase.SELECT_AIDING_GROUPS){
+						designateAidingGroup((StructureCard) child.Card());
 					}
 					//selectedCard = null;
 				}
 			});
 			
+			((GroupCard) child.Card()).attackCounter = 1;
+			
 			popup.setVisible(false);
 			popup.dispose();
 		}
+	}
+	
+	//-----------------------------------------Other UI Elements--------------------------------------------
+	private JButton btnEndAttack;
+	
+	//Create a label to show the attack modifier as the players' actions update it
+	public void outputAttackModifier(){
+		modifierPrompt = new JLabel("Attack modifier: " + GamePlay.attackModifier);
+		modifierPrompt.setBounds(850, 6, 500, 25);
+		modifierPrompt.setFont(modifierPrompt.getFont().deriveFont(20.0f));
+		modifierPrompt.setForeground(new Color(255, 50, 50));
+		gamePanel.add(modifierPrompt);
+		
+		frame.repaint();
+	}
+	
+	public void endAttackButton(){
+		btnEndAttack = new JButton("End Attack");
+		btnEndAttack.setBounds(new Rectangle(910, 540, 120, 30));
+		
+		btnEndAttack.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				btnEndAttack.setVisible(false);
+				btnEndAttack = null;
+				
+				//TODO - Actually end the attack
+			}
+		});
+		
+		gamePanel.add(btnEndAttack);
+		gamePanel.repaint();
+	}
+	
+	//Creates a button to return the phase to Global.SelectionPhase.NONE
+	public void createButtonEndPhase(String s){
+		JButton btn = new JButton(s);
+		btn.setBounds(new Rectangle(10, 50, 120, 30));
+		
+		btn.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				Global.selectionPhase = Global.SelectionPhase.NONE;
+				btn.setVisible(false);
+			}
+		});
+		
+		gamePanel.add(btn);
+		frame.repaint();
+	}
+	
+	public void removeEndAttackButton(){
+		if(btnEndAttack != null){
+			btnEndAttack.setVisible(false);
+			btnEndAttack = null;
+		}
+	}
+	
+	public void refreshAll(){
+		GenerateHand(player, cardsPanel);
 	}
 }

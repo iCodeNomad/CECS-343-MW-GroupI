@@ -2,6 +2,16 @@ import java.util.ArrayList;
 
 public class IlluminatiCard extends StructureCard {
 	
+	private boolean specialUsed;
+	
+	public boolean SpecialUsed(){
+		return this.specialUsed;
+	}
+	
+	public void setSpecialUsed(boolean specialUsed){
+		this.specialUsed = specialUsed;
+	}
+	
 	//Constructor Method
 	public IlluminatiCard(String name, int power, int transferablePower, int income, String imagePath) {
 		
@@ -17,14 +27,17 @@ public class IlluminatiCard extends StructureCard {
 		
 		this.outwardArrows = allArrows;
 		this.rotation = Rotation.UP;
+		specialUsed = false;
 	}
 
-	@Override
+	/*@Override
 	public String toString() {
-		return "IlluminatiCard [name = " + name + ", power=" + power + ", transferablePower=" + transferablePower + ", income=" + income
-				+ ", imagePath=" + imagePath + ", inwardArrow=" + inwardArrow + ", outwardArrows=" + outwardArrows
-				+ ", children=" + children + "]" + System.getProperty("line.separator");
-	}
+		return "IlluminatiCard [power=" + power + ", transferablePower=" + transferablePower + ", income=" + income
+				+ ", inwardArrow=" + inwardArrow + ", outwardArrows=" + outwardArrows + ", children=" + children
+				+ ", owner=" + owner + ", attackCounter=" + attackCounter + ", currentMoney=" + currentMoney
+				+ ", rotation=" + rotation + ", distanceFromIlluminati=" + distanceFromIlluminati + ", name=" + name
+				+ ", imagePath=" + imagePath + "]";
+	}*/
 	
 	
 }

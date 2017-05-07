@@ -1,41 +1,29 @@
 import java.awt.EventQueue;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+
+import javax.swing.JOptionPane;
 
 public class GamePlay {
 	
 	//Attributes - Attacking
-	private int attackModifier;
+	public static int attackModifier;
 	public static StructureCard attackingGroup;
+	public static ArrayList<StructureCard> aidingGroups;
+	public static ArrayList<Player> players = new ArrayList<Player>();
+	public static Global.Privilege privilege;
+	public static Player attackingPlayer;
 
 	private static GUI window;
 	
-	/*public StructureCard AttackingGroup() {
-		return attackingGroup;
-	}
-
-	public void setAttackingGroup(StructureCard attackingGroup) {
-		this.attackingGroup = attackingGroup;
-	}*/
-	
 	public static void main(String[] args) {
 		Deck deck = new Deck();
-		
-		/*EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					window = new GUI();
-					window.Frame().setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});*/
+		aidingGroups = new ArrayList<StructureCard>();
 		
 		window = new GUI();
-		
-		Player player = new Player("Tester", window);
-		
-		window.DialogBox("Hello there! This is an invalid group!");
+		players.add(new Player("Tester", window));
+		players.get(0).Illuminati().attackCounter = 1;
 	}
 	
 	
@@ -43,17 +31,18 @@ public class GamePlay {
 	//-----------------------------------------Attacking--------------------------------------------
 	
 	//Call this method to start the attack
-	public void attack(Player attackingPlayer){
+	public static void attack(Player attackPlayer){
+		attackingPlayer = attackPlayer;
 		Global.AttackType attackType = attackingPlayer.GUI().AttackTypePopup();
-		StructureCard attackingGroup = PromptAttackingGroup(attackingPlayer.GUI());
+		PromptAttackingGroup(attackingPlayer.GUI());
 		GroupCard defendingGroup;
 		
-		ArrayList<GroupCard> aidingGroups;
+		System.out.println(attackingGroup);
 		
-		Global.Privilege privilege = Global.Privilege.NOT_PRIVILEGED;
+		privilege = Global.Privilege.NOT_PRIVILEGED;
 		
 		//Select defending group, with checks based on attack type
-		if(attackType == Global.AttackType.CONTROL){
+		/*if(attackType == Global.AttackType.CONTROL){
 			defendingGroup = PromptDefendingGroupControl();
 		}else if(attackType == Global.AttackType.NEUTRALIZE){
 			defendingGroup = PromptDefendingGroupNeutralize();
@@ -75,7 +64,8 @@ public class GamePlay {
 			//Calculate attack modifier based on "direct control" ability
 			attackModifier += ((GroupCard) attackingGroup).CalculateDirectControlAbility(defendingGroup, attackType);
 			
-			//TODO - Add BFS to calculate attack modifier based on power structure position
+			//Uses BFS to calculate attack modifier based on power structure position
+			attackModifier += ((GroupCard) defendingGroup).CalculateStructureResistance();
 		}		
 		
 		//Calculate "Any Attempt" Abilities
@@ -86,20 +76,23 @@ public class GamePlay {
 		
 		//Calculates "Survivalists" ability
 		attackModifier += CheckSurvivalistsAbility(defendingGroup.Owner());
+		attackingPlayer.GUI().outputAttackModifier();
 		
-		//TODO - Add groups to aid attack.
-		aidingGroups = PromptAidingGroups();
+		//Prompt to add groups to aid attack.
+		PromptAidingGroups(attackingPlayer.GUI());
 		
-		//Maybe combine this with PromptAidingGroups().
 		//Calculates the effect of transferable power
-		attackModifier += CalculateAidingGroups(aidingGroups);
+		attackModifier += CalculateAidingGroups();
+		attackingPlayer.GUI().outputAttackModifier();*/
 		
-		//TODO - Bavarian Illuminati Special Attack
-		privilege = BavarianIlluminatiSpecial();
+		//Bavarian Illuminati Special Attack
+		if(attackingPlayer.Illuminati().Name() == "The Bavarian Illuminati" && !attackingPlayer.Illuminati().SpecialUsed() && attackingPlayer.Illuminati().CurrentMoney() >= 5){
+			privilege = BavarianIlluminatiSpecial();
+		}
 		
-		//TODO - Discard Special Card for Privilege
-		if(privilege != Global.Privilege.PRIVILEGED){
-			privilege = DiscardForPrivilege();
+		//Discard Special Card for Privilege
+		if(privilege != Global.Privilege.PRIVILEGED && attackingPlayer.SpecialCards().size() > 0){
+			DiscardForPrivilege(attackingPlayer.GUI());
 		}
 		
 		//TODO - Deep Agent
@@ -112,12 +105,29 @@ public class GamePlay {
 			privilege = DiscardForAbolish();
 		}
 		
-		//Spending phase of attack
+		//TODO - Spending phase of attack
 		
+		//Stores if the attack is successful
+		boolean attackSuccess = AttackRoll();
+		
+		if(attackSuccess){
+			attackingPlayer.GUI().DialogBox("Attack was successful!");
+			
+			if(attackType == Global.AttackType.CONTROL){
+				//TODO - Add logic for control (add group to power structure)
+			}else if(attackType == Global.AttackType.NEUTRALIZE){
+				//TODO - Add logic for neutralize
+			}else{
+				//TODO - Add logic for destroy
+			}
+		}else{
+			attackingPlayer.GUI().DialogBox("Attack was unsuccessful...");
+		}
 	}
 	
-	private StructureCard PromptAttackingGroup(GUI gui){
+	private static void PromptAttackingGroup(GUI gui){
 		gui.createPrompt("Please select an attacking group:");
+		gui.endAttackButton();
 		
 		Global.selectionPhase = Global.SelectionPhase.SELECT_ATTACKING_GROUP;
 		
@@ -127,32 +137,28 @@ public class GamePlay {
 			}catch(Exception e){}
 		}
 		
-		//TODO - Reprompt for attacking group is invalid
-		//Add option to cancel attack altogether
-		
 		gui.removePrompt();
-		return null;
 	}
 	
-	private GroupCard PromptDefendingGroupControl(){
+	private static GroupCard PromptDefendingGroupControl(){
 		//TODO - Add logic to select a defending group based on cards in play for an attack to control
 		//REMEMBER TO ADD CHECKS FOR DISCORDIAN SOCIETY
 		return null;
 	}
 	
-	private GroupCard PromptDefendingGroupNeutralize(){
+	private static GroupCard PromptDefendingGroupNeutralize(){
 		//TODO - Add logic to select a defending group based on cards in play for an attack to neutralize
 		//REMEMBER TO ADD CHECKS FOR DISCORDIAN SOCIETY
 		return null;
 	}
 	
-	private GroupCard PromptDefendingGroupDestroy(){
+	private static GroupCard PromptDefendingGroupDestroy(){
 		//TODO - Add logic to select a defending group based on cards in play for an attack to destroy
 		//REMEMBER TO ADD CHECKS FOR DISCORDIAN SOCIETY
 		return null;
 	}
 	
-	private int CalculateAnyAttempt(Player attackingPlayer, GroupCard defendingGroup, Global.AttackType attackType){
+	private static int CalculateAnyAttempt(Player attackingPlayer, GroupCard defendingGroup, Global.AttackType attackType){
 		int returnVal = 0;
 		
 		for(GroupCard card: attackingPlayer.GroupCards()){
@@ -176,7 +182,7 @@ public class GamePlay {
 		return returnVal;
 	}
 	
-	private int CheckSurvivalistsAbility(Player defendingPlayer){
+	private static int CheckSurvivalistsAbility(Player defendingPlayer){
 		for(GroupCard card: defendingPlayer.GroupCards()){
 			if(card.Name().equals("Survivalists")){
 				return -2;
@@ -186,7 +192,7 @@ public class GamePlay {
 		return 0;
 	}
 	
-	private int CheckChineseCampaignDonors(GroupCard defendingGroup){
+	private static int CheckChineseCampaignDonors(GroupCard defendingGroup){
 		//TODO - REMEMBER TO ADD CHECKS FOR DISCORDIAN SOCIETY
 		if(defendingGroup.hasAlignment(GroupCard.Alignment.GOVERNMENT)){
 			return 4;
@@ -194,37 +200,92 @@ public class GamePlay {
 		return 0;
 	}
 	
-	private ArrayList<GroupCard> PromptAidingGroups(){
-		//TODO - Add logic to select aiding groups
-		return null;
+	private static void PromptAidingGroups(GUI gui){
+		gui.createPrompt("Please select groups to aid in the attack:");
+		
+		gui.createButtonEndPhase("Done");
+		
+		Global.selectionPhase = Global.SelectionPhase.SELECT_AIDING_GROUPS;
+		
+		gui.Frame().repaint();
+		
+		while(Global.selectionPhase == Global.SelectionPhase.SELECT_AIDING_GROUPS){
+			try{
+				Thread.sleep(200);
+			}catch(Exception e){}
+		}
+		
+		gui.removePrompt();
 	}
 	
-	private int CalculateAidingGroups(ArrayList<GroupCard> aidingGroups){
+	private static int CalculateAidingGroups(){
 		int aidingPower = 0;
 		
 		if(aidingGroups.isEmpty()){
 			return 0;
 		}
-		for(GroupCard card:aidingGroups){
+		for(StructureCard card:aidingGroups){
 			aidingPower += card.transferablePower;
 		}
 		
 		return aidingPower;
 	}
 	
-	private Global.Privilege BavarianIlluminatiSpecial(){
-		//TODO - Add logic to check if player is Bavarian Illuminati, prompt, response, 5MB, etc.
+	private static Global.Privilege BavarianIlluminatiSpecial(){
+		int playerResponse = JOptionPane.showConfirmDialog(null, "Would you like to use your special ability to spend 5 MB to make this attack privileged?");
+		if(playerResponse == JOptionPane.YES_OPTION){
+			attackingGroup.Owner().Illuminati().removeMoney(5);
+			return Global.Privilege.PRIVILEGED;
+		}
+		
 		return Global.Privilege.NOT_PRIVILEGED;
 	}
 	
-	private Global.Privilege DiscardForPrivilege(){
-		//TODO - Add logic to prompt player to discard special for privilege
-		return Global.Privilege.NOT_PRIVILEGED;
+	private static void DiscardForPrivilege(GUI gui){
+		int playerResponse = JOptionPane.showConfirmDialog(null, "Would you like to discard a special card to make this attack privileged?", null, JOptionPane.YES_NO_OPTION);
+		
+		if(playerResponse == JOptionPane.YES_OPTION){
+			Global.selectionPhase = Global.SelectionPhase.PRIVILEGE_DISCARD;
+			
+			gui.createPrompt("Please select a special card to discard:");
+			
+			gui.createButtonEndPhase("Done");
+			
+			gui.Frame().repaint();
+			
+			while(Global.selectionPhase == Global.SelectionPhase.PRIVILEGE_DISCARD){
+				try{
+					Thread.sleep(200);
+				}catch(Exception e){}
+			}
+			
+			if(gui.SelectedCards().size() > 0){
+				for(CardGUI card: gui.SelectedCards()){
+					attackingPlayer.RemoveSpecialCard((SpecialCard) card.Card()); 
+				}
+				
+				gui.refreshAll();
+				privilege = Global.Privilege.PRIVILEGED;
+			}
+			
+			gui.removePrompt();
+		}
 	}
 	
-	private Global.Privilege DiscardForAbolish(){
+	private static Global.Privilege DiscardForAbolish(){
 		//TODO - Add logic to prompt player to discard specials to abolish privilege
 		return Global.Privilege.NOT_PRIVILEGED;
+	}
+	
+	private static boolean AttackRoll(){
+		int roll = Die.roll();
+		attackingPlayer.GUI().DialogBox("You rolled a " + roll + "!");
+		
+		if(roll >= 11 || roll > attackModifier){
+			return false;
+		}else{
+			return true;
+		}
 	}
 
 }

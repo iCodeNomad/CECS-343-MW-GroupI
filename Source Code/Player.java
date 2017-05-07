@@ -64,6 +64,10 @@ public class Player {
 		groupCards.remove(groupCard);
 	}
 	
+	public void RemoveSpecialCard(SpecialCard specialCard){
+		specialCards.remove(specialCard);
+	}
+	
 	//Player draws a card from the deck
 	//Card is added to player's hand
 	public void DrawCard(Deck deck){
