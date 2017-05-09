@@ -826,6 +826,7 @@ public class Deck {
 		//White Collar Crime
 		specialCard = new SpecialCard("White Collar Crime", IMAGE_PATH + "WhiteCollarCrime.png");
 		deck.add(specialCard);
+//
 	
 
 	}
