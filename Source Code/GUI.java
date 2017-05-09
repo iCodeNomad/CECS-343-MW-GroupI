@@ -1,7 +1,5 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.Rectangle;
@@ -13,6 +11,7 @@ import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -21,7 +20,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
 
 public class GUI {
@@ -31,7 +29,12 @@ public class GUI {
 	private JTextField textField;
 	//private JTextField textField_1;
 	
+	private JPanel displayPanel;
 	private FieldGUI gamePanel;
+	//private CardLayout cardLayout;
+	
+	//Currently shows FieldGUI
+	private FieldGUI currentPanel;
 	
 	//Used to pass an arrow to the mouse handler in the popup
 	private StructureCard.Arrow actionArrow;
@@ -79,8 +82,6 @@ public class GUI {
 		
 		frame = new JFrame();
 		frame.setSize(1300, 800);
-		//frame.getBackground(red);
-		//frame.setBounds(200, 200, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		
@@ -94,23 +95,27 @@ public class GUI {
 		cardsPanel.setBounds(6, 601, 735, 111);
 		panel.add(cardsPanel);
 		cardsPanel.setLayout(null);
-		
-		//player = new Player("Joe");
+
 		Deck deck = new Deck();
 		player.SetIlluminati(deck.drawIlluminati());
 		
 		CardGUI illuminatiGUI = new CardGUI(player.Illuminati(), 5, 10);
 		addEventHandler(illuminatiGUI);
+		
+		//Initialize Game Panel
+		displayPanel = new JPanel();
+		displayPanel.setBorder(new LineBorder(new Color(0, 0, 0), 3));
+		displayPanel.setBackground(new Color(255, 255, 240));
+		displayPanel.setBounds(6, 6, 1049, 583);
+		panel.add(displayPanel);
+		displayPanel.setLayout(null);
+		
 		gamePanel = new FieldGUI(illuminatiGUI);
-		gamePanel.setBorder(new LineBorder(new Color(0, 0, 0), 3));
-		gamePanel.setBackground(new Color(255, 255, 240));
-		gamePanel.setBounds(6, 6, 1049, 583);
-		panel.add(gamePanel);
-		gamePanel.setLayout(null);
+		displayPanel.add(gamePanel);
+		
+		currentPanel = gamePanel;
 		
 		gamePanelCards.add(illuminatiGUI);
-		
-		//GenerateHand(player, cardsPanel);
 		
 		//Add the deck to the field
 		JLabel fieldDeck = new JLabel("");
@@ -141,20 +146,49 @@ public class GUI {
 		panel.add(rightSidePanel);
 		rightSidePanel.setLayout(null);
 		
+		//Create ComboBox for viewing other play fields
+		JLabel lblOptions = new JLabel("Viewing Field");
+		lblOptions.setBounds(6, 6, 222, 30);
+		rightSidePanel.add(lblOptions);
+		lblOptions.setFont(new Font("Lucida Grande", Font.BOLD | Font.ITALIC, 16));
+		
+		String[] fieldOptions = {"Player 1", "Player 2", "Player 3", "Uncontrolled Area"};
+		JComboBox fieldSelection = new JComboBox(fieldOptions);
+		fieldSelection.setBounds(6, 36, 222, 25);
+		rightSidePanel.add(fieldSelection);
+		fieldSelection.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e){
+				String response = (String) fieldSelection.getSelectedItem();
+				response = response.substring(response.length() - 1);
+				int playerNum = Integer.parseInt(response) - 1;
+				displayPanel.removeAll();
+				
+				displayPanel.add(GamePlay.players.get(playerNum).GUI().gamePanel);
+				frame.revalidate();
+				frame.repaint();
+				displayPanel.revalidate();
+				displayPanel.repaint();
+				currentPanel = GamePlay.players.get(playerNum).GUI().gamePanel;
+				System.out.println(playerNum);
+				//TODO - Finish switching game panels (uncontrolled area)
+			}
+		});
+		
+		JLabel lblLogs = new JLabel("Logs");
+		lblLogs.setBounds(6, 61, 220, 30);
+		rightSidePanel.add(lblLogs);
+		lblLogs.setFont(new Font("Lucida Grande", Font.BOLD | Font.ITALIC, 16));
+		
 		JEditorPane logsPane = new JEditorPane();
 		logsPane.setText("player 1 logged in.\nplayer 2 logged in.\nplayer 3 logged in.\nGame Starts NOW...\nplayer 1 turn!\nplayer 1 added a card.\nplayer 1 end turn!\nplayer 2 turn!\nplayer 2 added a card.\nplayer 2 end turn!\nplayer 3 turn!\nplayer 3 added a card.");
-		logsPane.setBounds(6, 39, 221, 193);
+		logsPane.setBounds(6, 91, 222, 140);
 		rightSidePanel.add(logsPane);
 		
 		JLabel lblChat = new JLabel("Chat");
 		lblChat.setBounds(6, 239, 222, 29);
 		rightSidePanel.add(lblChat);
 		lblChat.setFont(new Font("Lucida Grande", Font.BOLD | Font.ITALIC, 16));
-		
-		JLabel lblLogs = new JLabel("Logs");
-		lblLogs.setBounds(6, 6, 220, 29);
-		rightSidePanel.add(lblLogs);
-		lblLogs.setFont(new Font("Arial", Font.PLAIN, 20));
 		
 		JTextPane chatPane = new JTextPane();
 		chatPane.setText("Player 1: Hi there.\nPlayer 1: I wish you the best, but i will win.\nPlayer 2: I dont think so.\nPlayer 1: haha will see.\nPlayer 2: kk\nPlayer 3: can you please hurry up and play");
@@ -571,6 +605,181 @@ public class GUI {
 		}
 	}
 	
+	//Attacker Spending Popup
+	public int AttackingSpendingPopup(StructureCard attackingGroup, IlluminatiCard illuminatiCard){
+		String input;
+		int groupVal = Integer.MAX_VALUE;
+		
+		while(groupVal == Integer.MAX_VALUE){
+			input = (String) JOptionPane.showInputDialog(frame, "How much money will the attacking group spend on the attack? (Amount of MB in treasury: " + attackingGroup.CurrentMoney() + ")", "Spend Money", JOptionPane.PLAIN_MESSAGE, null, null, "0");
+			try{
+				groupVal = Integer.parseInt(input);
+				
+				if(groupVal > attackingGroup.CurrentMoney()){
+					DialogBox("The attacking group does not have enough MB.");
+					groupVal = Integer.MAX_VALUE;
+				}
+				
+				if(groupVal < 0){
+					DialogBox("The number cannnot be negative!");
+					groupVal = Integer.MAX_VALUE;
+				}
+				
+			}catch (NumberFormatException e){
+				DialogBox("Invalid input. Please try again");
+			}
+		}
+		
+		attackingGroup.removeMoney(groupVal);
+		
+		int illuminatiVal = 0;
+		
+		if(illuminatiCard != attackingGroup){
+			illuminatiVal = Integer.MAX_VALUE;
+			
+			while(illuminatiVal == Integer.MAX_VALUE){
+				input = (String) JOptionPane.showInputDialog(frame, "How much money will the Illuminati spend on the attack? (Amount of MB in treasury: " + illuminatiCard.CurrentMoney() + ")", "Spend Money", JOptionPane.PLAIN_MESSAGE, null, null, "0");
+				try{
+					illuminatiVal = Integer.parseInt(input);
+					
+					if(illuminatiVal > illuminatiCard.CurrentMoney()){
+						DialogBox("The Illuminati does not have enough MB.");
+						illuminatiVal = Integer.MAX_VALUE;
+					}
+					
+					if(illuminatiVal < 0){
+						DialogBox("The number cannnot be negative!");
+						illuminatiVal = Integer.MAX_VALUE;
+					}
+					
+				}catch (NumberFormatException e){
+					DialogBox("Invalid input. Please try again");
+				}
+			}
+		}
+		
+		illuminatiCard.removeMoney(illuminatiVal);
+		
+		return illuminatiVal + groupVal;
+	}
+	
+	//Defender Spending Popup
+	public int DefendingSpendingPopup(StructureCard defendingGroup, IlluminatiCard illuminatiCard){
+		String input;
+		int groupVal = Integer.MAX_VALUE;
+		
+		while(groupVal == Integer.MAX_VALUE){
+			input = (String) JOptionPane.showInputDialog(frame, "How much money will the defennding group spend on the attack? (Amount of MB in treasury: " + defendingGroup.CurrentMoney() + ")", "Spend Money", JOptionPane.PLAIN_MESSAGE, null, null, "0");
+			try{
+				groupVal = Integer.parseInt(input);
+				
+				if(groupVal > defendingGroup.CurrentMoney()){
+					DialogBox("The defending group does not have enough MB.");
+					groupVal = Integer.MAX_VALUE;
+				}
+				
+				if(groupVal < 0){
+					DialogBox("The number cannnot be negative!");
+					groupVal = Integer.MAX_VALUE;
+				}
+				
+			}catch (NumberFormatException e){
+				DialogBox("Invalid input. Please try again");
+			}
+		}
+		
+		defendingGroup.removeMoney(groupVal);
+		
+		int illuminatiVal = 0;
+		
+		if(illuminatiCard != defendingGroup){
+			illuminatiVal = Integer.MAX_VALUE;
+			
+			while(illuminatiVal == Integer.MAX_VALUE){
+				input = (String) JOptionPane.showInputDialog(frame, "How much money will the Illuminati spend on the attack? (Amount of MB in treasury: " + illuminatiCard.CurrentMoney() + ")", "Spend Money", JOptionPane.PLAIN_MESSAGE, null, null, "0");
+				try{
+					illuminatiVal = Integer.parseInt(input);
+					
+					if(illuminatiVal > illuminatiCard.CurrentMoney()){
+						DialogBox("The Illuminati does not have enough MB.");
+						illuminatiVal = Integer.MAX_VALUE;
+					}
+					
+					if(illuminatiVal < 0){
+						DialogBox("The number cannnot be negative!");
+						illuminatiVal = Integer.MAX_VALUE;
+					}
+					
+				}catch (NumberFormatException e){
+					DialogBox("Invalid input. Please try again");
+				}
+			}
+		}
+		
+		illuminatiCard.removeMoney(illuminatiVal);
+		
+		return 0 - (illuminatiVal + groupVal * 2);
+	}
+	
+	//Interference Spending Popup
+		public int InterferenceSpendingPopup(IlluminatiCard illuminatiCard){
+			String input;
+			int assistingVal = Integer.MAX_VALUE;
+			
+			while(assistingVal == Integer.MAX_VALUE){
+				input = (String) JOptionPane.showInputDialog(frame, "How much money will your Illuminati spend on assisting the attack? (Amount of MB in treasury: " + illuminatiCard.CurrentMoney() + ")", "Spend Money", JOptionPane.PLAIN_MESSAGE, null, null, "0");
+				try{
+					assistingVal = Integer.parseInt(input);
+					
+					if(assistingVal > illuminatiCard.CurrentMoney()){
+						DialogBox("The Illuminati does not have enough MB.");
+						assistingVal = Integer.MAX_VALUE;
+					}
+					
+					if(assistingVal < 0){
+						DialogBox("The number cannnot be negative!");
+						assistingVal = Integer.MAX_VALUE;
+					}
+					
+				}catch (NumberFormatException e){
+					DialogBox("Invalid input. Please try again");
+				}
+			}
+			
+			illuminatiCard.removeMoney(assistingVal);
+			
+			int interferingVal = 0;
+			
+			if(assistingVal == 0){
+				
+				interferingVal = Integer.MAX_VALUE;
+				
+				while(interferingVal == Integer.MAX_VALUE){
+					input = (String) JOptionPane.showInputDialog(frame, "How much money will your Illuminati spend on interfering in the attack? (Amount of MB in treasury: " + illuminatiCard.CurrentMoney() + ")", "Spend Money", JOptionPane.PLAIN_MESSAGE, null, null, "0");
+					try{
+						interferingVal = Integer.parseInt(input);
+						
+						if(interferingVal > illuminatiCard.CurrentMoney()){
+							DialogBox("The Illuminati does not have enough MB.");
+							interferingVal = Integer.MAX_VALUE;
+						}
+						
+						if(interferingVal < 0){
+							DialogBox("The number cannnot be negative!");
+							interferingVal = Integer.MAX_VALUE;
+						}
+						
+					}catch (NumberFormatException e){
+						DialogBox("Invalid input. Please try again");
+					}
+				}
+			}
+			
+			illuminatiCard.removeMoney(interferingVal);
+			
+			return assistingVal - interferingVal;
+		}
+	
 	//------------------------------------------Action Listeners-------------------------------------
 	
 	private class ArrowButtonListener implements ActionListener{
@@ -617,15 +826,18 @@ public class GUI {
 	//-----------------------------------------Other UI Elements--------------------------------------------
 	private JButton btnEndAttack;
 	
-	//Create a label to show the attack modifier as the players' actions update it
-	public void outputAttackModifier(){
-		modifierPrompt = new JLabel("Attack modifier: " + GamePlay.attackModifier);
-		modifierPrompt.setBounds(850, 6, 500, 25);
-		modifierPrompt.setFont(modifierPrompt.getFont().deriveFont(20.0f));
-		modifierPrompt.setForeground(new Color(255, 50, 50));
-		gamePanel.add(modifierPrompt);
+	//Create a label to show the attack modifier as the players' actions update it FOR ALL PLAYERS
+	public static void outputAttackModifier(ArrayList<Player> players){
 		
-		frame.repaint();
+		for(Player p: players){
+			p.GUI().modifierPrompt = new JLabel("Attack modifier: " + GamePlay.attackModifier);
+			p.GUI().modifierPrompt.setBounds(850, 6, 500, 25);
+			p.GUI().modifierPrompt.setFont(p.GUI().modifierPrompt.getFont().deriveFont(20.0f));
+			p.GUI().modifierPrompt.setForeground(new Color(255, 50, 50));
+			p.GUI().gamePanel.add(p.GUI().modifierPrompt);
+			
+			p.GUI().frame.repaint();
+		}
 	}
 	
 	public void endAttackButton(){
