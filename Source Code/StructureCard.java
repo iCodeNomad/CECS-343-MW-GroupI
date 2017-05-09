@@ -79,11 +79,13 @@ public abstract class StructureCard extends Card{
 	
 	public void addMoney(int amount){
 		currentMoney += amount;
+		Bank.removeMoney(amount);
 	}
 	
 	public void removeMoney(int amount){
 		if((currentMoney - amount) >= 0){
 			currentMoney -= amount;
+			Bank.addMoney(amount);
 		}
 	}
 

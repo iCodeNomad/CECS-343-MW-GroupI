@@ -1,29 +1,43 @@
-import java.awt.EventQueue;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
 
 import javax.swing.JOptionPane;
 
 public class GamePlay {
 	
+	public enum SPENDING_TYPE{
+		ATTACKING_PLAYER, DEFENDING_PLAYER, INTERFERING_PLAYER;
+	}
+	
 	//Attributes - Attacking
 	public static int attackModifier;
-	public static StructureCard attackingGroup;
+	public static StructureCard attackingGroup, defendingGroup;
 	public static ArrayList<StructureCard> aidingGroups;
 	public static ArrayList<Player> players = new ArrayList<Player>();
 	public static Global.Privilege privilege;
-	public static Player attackingPlayer;
+	public static Player attackingPlayer, defendingPlayer;
 
 	private static GUI window;
+	private static GUI window2;
+	private static GUI window3;
 	
 	public static void main(String[] args) {
 		Deck deck = new Deck();
 		aidingGroups = new ArrayList<StructureCard>();
 		
 		window = new GUI();
+		window2 = new GUI();
+		window3 = new GUI();
+		
 		players.add(new Player("Tester", window));
+		players.add(new Player("Tester2", window2));
+		players.add(new Player("Tester3", window3));
 		players.get(0).Illuminati().attackCounter = 1;
+		players.get(1).Illuminati().attackCounter = 1;
+		players.get(2).Illuminati().attackCounter = 1;
+		
+		System.out.println(players.get(0).Illuminati().toString());
+		System.out.println(players.get(1).Illuminati().toString());
+		System.out.println(players.get(2).Illuminati().toString());
 	}
 	
 	
@@ -35,7 +49,6 @@ public class GamePlay {
 		attackingPlayer = attackPlayer;
 		Global.AttackType attackType = attackingPlayer.GUI().AttackTypePopup();
 		PromptAttackingGroup(attackingPlayer.GUI());
-		GroupCard defendingGroup;
 		
 		System.out.println(attackingGroup);
 		
@@ -49,6 +62,8 @@ public class GamePlay {
 		}else{		//Global.AttackType.DESTROY
 			defendingGroup = PromptDefendingGroupDestroy();
 		}
+		
+		defendingPlayer = defendingGroup.Owner();
 		
 		//Change attack modifier based on power and resistance
 		attackModifier += attackingGroup.CalculatePowerModifier(defendingGroup, attackType);
@@ -76,15 +91,15 @@ public class GamePlay {
 		
 		//Calculates "Survivalists" ability
 		attackModifier += CheckSurvivalistsAbility(defendingGroup.Owner());
-		attackingPlayer.GUI().outputAttackModifier();
+		GUI.outputAttackModifier(players);
 		
 		//Prompt to add groups to aid attack.
 		PromptAidingGroups(attackingPlayer.GUI());
 		
 		//Calculates the effect of transferable power
-		attackModifier += CalculateAidingGroups();
-		attackingPlayer.GUI().outputAttackModifier();*/
-		
+		attackModifier += CalculateAidingGroups();*/
+		GUI.outputAttackModifier(players);
+
 		//Bavarian Illuminati Special Attack
 		if(attackingPlayer.Illuminati().Name() == "The Bavarian Illuminati" && !attackingPlayer.Illuminati().SpecialUsed() && attackingPlayer.Illuminati().CurrentMoney() >= 5){
 			privilege = BavarianIlluminatiSpecial();
@@ -105,7 +120,8 @@ public class GamePlay {
 			privilege = DiscardForAbolish();
 		}
 		
-		//TODO - Spending phase of attack
+		//Spending phase of attack
+		attackModifier += SpendingPhase();
 		
 		//Stores if the attack is successful
 		boolean attackSuccess = AttackRoll();
@@ -277,6 +293,48 @@ public class GamePlay {
 		return Global.Privilege.NOT_PRIVILEGED;
 	}
 	
+	private static int SpendingPhase(){
+		int attackModifier = 0;
+		int phaseModifier = 0;
+		boolean spentThisPhase = true;
+		
+		while(spentThisPhase){
+			spentThisPhase = false;
+			phaseModifier = 0;
+			
+			//Attacker spends MB
+			phaseModifier += attackingPlayer.GUI().AttackingSpendingPopup(attackingGroup, attackingPlayer.Illuminati());
+			if(phaseModifier != 0){
+				spentThisPhase = true;
+				attackModifier += phaseModifier;
+				phaseModifier = 0;
+			}
+			
+			//Defender spends MB
+			phaseModifier += defendingPlayer.GUI().DefendingSpendingPopup(defendingGroup, attackingPlayer.Illuminati());
+			if(phaseModifier != 0){
+				spentThisPhase = true;
+				attackModifier += phaseModifier;
+				phaseModifier = 0;
+			}
+			
+			//Other players interfere
+			for(Player p: players){
+				if(p != attackingPlayer && p != defendingPlayer){
+					phaseModifier += p.GUI().InterferenceSpendingPopup(p.Illuminati());
+					if(phaseModifier != 0){
+						spentThisPhase = true;
+						attackModifier += phaseModifier;
+						phaseModifier = 0;
+					}
+				}
+			}
+		}
+		
+		return attackModifier;
+	}
+	
+	//Rolls the dice to see if an attack is successful
 	private static boolean AttackRoll(){
 		int roll = Die.roll();
 		attackingPlayer.GUI().DialogBox("You rolled a " + roll + "!");
