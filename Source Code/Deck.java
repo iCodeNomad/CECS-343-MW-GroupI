@@ -28,6 +28,7 @@ public class Deck {
 	//Called once in the constructor
 	private void createDeck(){
 		
+		
 		//******************Ryan will add the following:****************************
 				//DONE ALREADY - NOT IN PAGE ORDER: Nuclear Power Companies, The Mafia
 				//NEED TO ADD Orbital Mind Control Lasers, Punk Rockers, Post Office
@@ -143,6 +144,265 @@ public class Deck {
 		groupCard = new GroupCard("Comic Books",1,0,1,2, IMAGE_PATH + "ComicBooks.png", GroupCard.Arrow.LEFT, outwardArrows,alignments);
 		deck.add(groupCard);
 		
+		//Congressional Wives
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.RIGHT);
+		alignments = new ArrayList<GroupCard.Alignment>();
+		alignments.add(GroupCard.Alignment.CONSERVATIVE);
+		alignments.add(GroupCard.Alignment.STRAIGHT);
+		groupCard = new GroupCard("Congressional Wives",1,0,4,1,IMAGE_PATH + "CongressionalWives.png",GroupCard.Arrow.LEFT,outwardArrows,alignments);
+		deck.add(groupCard);
+		
+		//Convenience Stores
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.BOTTOM);
+		alignments = new ArrayList<GroupCard.Alignment>();
+		alignments.add(GroupCard.Alignment.STRAIGHT);
+		groupCard = new GroupCard("Convenience Stores",1,0,4,3,IMAGE_PATH + "Convenience Stores.png",GroupCard.Arrow.LEFT,outwardArrows,alignments);
+		deck.add(groupCard);
+		
+		//CopyShops
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.LEFT);
+		alignments = new ArrayList<GroupCard.Alignment>();
+		alignments.add(GroupCard.Alignment.PEACEFUL);
+		groupCard = new GroupCard("Copy Shops",1,0,3,4,IMAGE_PATH + "CopyShops.png",GroupCard.Arrow.RIGHT,outwardArrows,alignments);
+		deck.add(groupCard);
+		
+		//Cycle Gangs
+		alignments = new ArrayList<GroupCard.Alignment>();
+		alignments.add(GroupCard.Alignment.VIOLENT);
+		alignments.add(GroupCard.Alignment.WEIRD);
+		groupCard = new GroupCard("Cycle Gangs",0,0,4,0,IMAGE_PATH + "CycleGangs.png",GroupCard.Arrow.LEFT,null,alignments);
+		deck.add(groupCard);
+		
+		//Democrats
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.LEFT);
+		outwardArrows.add(GroupCard.Arrow.BOTTOM);
+		groupCard = new GroupCard("Democrats",5,0,4,3,IMAGE_PATH + "Democrats.png",GroupCard.Arrow.RIGHT,outwardArrows,GroupCard.Alignment.LIBERAL);
+		deck.add(groupCard);
+		
+		//Eco-Guerrillas
+		alignments = new ArrayList<GroupCard.Alignment>();
+		alignments.add(GroupCard.Alignment.LIBERAL);
+		alignments.add(GroupCard.Alignment.VIOLENT);
+		alignments.add(GroupCard.Alignment.WEIRD);
+		groupCard = new GroupCard("Eco-Guerrillas",0,0,6,1,IMAGE_PATH + "EcoGuerrillas.png",GroupCard.Arrow.RIGHT,null,alignments);
+		deck.add(groupCard);
+		
+		//Empty Vee
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.LEFT);
+		outwardArrows.add(GroupCard.Arrow.BOTTOM);
+		//groupCard = new GroupCard("Empty Vee",3,0,3,4,IMAGE_PATH + "EmptyVee.png",GroupCard.Arrow.RIGHT,outwardArrows,null);
+		//deck.add(groupCard);
+		
+		//Evil Geniuses for a Better Tomorrow
+		alignments = new ArrayList<GroupCard.Alignment>();
+		alignments.add(GroupCard.Alignment.VIOLENT);
+		alignments.add(GroupCard.Alignment.WEIRD);
+		groupCard = new GroupCard("Evil Geniuses for a Better Tomorrow",0,2,6,3,IMAGE_PATH + "EvilGeniusesForABetterTomorrow.png",GroupCard.Arrow.RIGHT,null,alignments);
+		deck.add(groupCard);
+		
+		//Fast Food Chains
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.BOTTOM);
+		groupCard = new GroupCard("Fast Food Chains",2,0,4,3,IMAGE_PATH + "FastFoodChains.png",GroupCard.Arrow.LEFT,outwardArrows,GroupCard.Alignment.STRAIGHT);
+		deck.add(groupCard);
+		
+		//F.B.I
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.BOTTOM);
+		outwardArrows.add(GroupCard.Arrow.TOP);
+		alignments = new ArrayList<GroupCard.Alignment>();
+		alignments.add(GroupCard.Alignment.GOVERNMENT);
+		alignments.add(GroupCard.Alignment.STRAIGHT);
+		groupCard = new GroupCard("F.B.I",4,2,6,0,IMAGE_PATH + "FBI.png",GroupCard.Arrow.RIGHT,outwardArrows,alignments);
+		deck.add(groupCard);
+		
+		//Federal Reserve
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.TOP);
+		outwardArrows.add(GroupCard.Arrow.RIGHT);
+		groupCard = new GroupCard("Federal Reserve",5,3,7,6,IMAGE_PATH + "FederalReserve.png",GroupCard.Arrow.LEFT,outwardArrows,GroupCard.Alignment.GOVERNMENT);
+		deck.add(groupCard);
+		
+		//Feminists
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.BOTTOM);
+		groupCard = new GroupCard("Feminists",2,0,2,1,IMAGE_PATH + "Feminists.png",GroupCard.Arrow.LEFT,outwardArrows,GroupCard.Alignment.LIBERAL);
+		deck.add(groupCard);
+		
+		//Fiendish Fluoridators
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.TOP);
+		outwardArrows.add(GroupCard.Arrow.RIGHT);
+		alignments = new ArrayList<GroupCard.Alignment>();
+		alignments.add(GroupCard.Alignment.COMMUNIST);
+		alignments.add(GroupCard.Alignment.FANATIC);
+		groupCard = new GroupCard("Fiendish Fluoridators",3,0,5,1,IMAGE_PATH + "FiendishFluoridators.png",GroupCard.Arrow.LEFT,outwardArrows,alignments);
+		deck.add(groupCard);
+		
+		//Flat Earthers
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.LEFT);
+		alignments = new ArrayList<GroupCard.Alignment>();
+		alignments.add(GroupCard.Alignment.WEIRD);
+		alignments.add(GroupCard.Alignment.CONSERVATIVE);
+		groupCard = new GroupCard("Flat Earthers",1,0,2,1,IMAGE_PATH + "FlatEarthers.png",GroupCard.Arrow.RIGHT,outwardArrows,alignments);
+		deck.add(groupCard);
+		
+		//Fnord Motor Company
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.RIGHT);
+		groupCard = new GroupCard("Fnord Motor Company",2,0,4,2,IMAGE_PATH + "FnordMotorCompany.png",GroupCard.Arrow.LEFT,outwardArrows,GroupCard.Alignment.PEACEFUL);
+		deck.add(groupCard);
+		
+		//Fraternal Orders
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.TOP);
+		groupCard = new GroupCard("Fraternal Orders",3,0,5,2,IMAGE_PATH + "FraternalOrders.png",GroupCard.Arrow.RIGHT,outwardArrows,GroupCard.Alignment.CONSERVATIVE);
+		deck.add(groupCard);
+		
+		//Girlie Magazines
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.BOTTOM);
+		groupCard = new GroupCard("Girlie Magazines",2,0,2,3,IMAGE_PATH + "GirlieMagazines.png",GroupCard.Arrow.RIGHT,outwardArrows,GroupCard.Alignment.LIBERAL);
+		deck.add(groupCard);
+		
+		//Goldfish Fanciers
+		alignments = new ArrayList<GroupCard.Alignment>();
+		alignments.add(GroupCard.Alignment.PEACEFUL);
+		alignments.add(GroupCard.Alignment.FANATIC);
+		groupCard = new GroupCard("Goldfish Fanciers",0,0,4,1,IMAGE_PATH + "GoldfishFanciers.png",GroupCard.Arrow.LEFT,null,alignments);
+		deck.add(groupCard);
+		
+		//Gun Lobby
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.BOTTOM);
+		outwardArrows.add(GroupCard.Arrow.LEFT);
+		alignments = new ArrayList<GroupCard.Alignment>();
+		alignments.add(GroupCard.Alignment.CONSERVATIVE);
+		alignments.add(GroupCard.Alignment.VIOLENT);
+		//groupCard = new GroupCard("Gun Lobby",1,0,*,1,IMAGE_PATH + "GunLobby.png",GroupCard.Arrow.RIGHT,outwardArrows,alignments);
+		//deck.add(groupCard);
+		
+		//Hackers
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.TOP);
+		alignments = new ArrayList<GroupCard.Alignment>();
+		alignments.add(GroupCard.Alignment.WEIRD);
+		alignments.add(GroupCard.Alignment.FANATIC);
+		groupCard = new GroupCard("Hackers",1,1,4,2,IMAGE_PATH + "Hackers.png",GroupCard.Arrow.RIGHT,outwardArrows,alignments);
+		deck.add(groupCard);
+		
+		//Health Food Stores
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.BOTTOM);
+		groupCard = new GroupCard("Health Food Stores",1,0,3,2,IMAGE_PATH + "HealthFoodStores.png",GroupCard.Arrow.LEFT,outwardArrows,GroupCard.Alignment.LIBERAL);
+		deck.add(groupCard);
+		
+		//Hollywood
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.BOTTOM);
+		outwardArrows.add(GroupCard.Arrow.RIGHT);
+		groupCard = new GroupCard("Hollywood",2,0,0,5,IMAGE_PATH + "Hollywood.png",GroupCard.Arrow.LEFT,outwardArrows,GroupCard.Alignment.LIBERAL);
+		deck.add(groupCard);
+		
+		//Intellectuals
+		alignments = new ArrayList<GroupCard.Alignment>();
+		alignments.add(GroupCard.Alignment.WEIRD);
+		alignments.add(GroupCard.Alignment.FANATIC);
+		groupCard = new GroupCard("Intellectuals",0,0,3,1,IMAGE_PATH + "Intellectuals.png",GroupCard.Arrow.LEFT,null,alignments);
+		deck.add(groupCard);
+		
+		//International Cocaine Smugglers
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.TOP);
+		outwardArrows.add(GroupCard.Arrow.BOTTOM);
+		outwardArrows.add(GroupCard.Arrow.RIGHT);
+		groupCard = new GroupCard("International Cocaine Smugglers",3,0,5,5,IMAGE_PATH + "InternationalCocaineSmugglers.png",GroupCard.Arrow.LEFT,outwardArrows,GroupCard.Alignment.CRIMINAL);
+		deck.add(groupCard);
+		
+		//International Communist Conspiracy
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.TOP);
+		outwardArrows.add(GroupCard.Arrow.BOTTOM);
+		outwardArrows.add(GroupCard.Arrow.LEFT);
+		groupCard = new GroupCard("International Communist Conspiracy",7,0,8,6,IMAGE_PATH + "InternationalCommunistConspiracy.png",GroupCard.Arrow.RIGHT,outwardArrows,GroupCard.Alignment.COMMUNIST);
+		deck.add(groupCard);
+		
+		//I.R.S
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.TOP);
+		outwardArrows.add(GroupCard.Arrow.BOTTOM);
+		alignments = new ArrayList<GroupCard.Alignment>();
+		alignments.add(GroupCard.Alignment.CRIMINAL);
+		alignments.add(GroupCard.Alignment.GOVERNMENT);
+		//groupCard = new GroupCard("I.R.S",5,3,5,*,IMAGE_PATH + "IRS.png",GroupCard.Arrow.RIGHT,outwardArrows,alignments);
+		//deck.add(groupCard);
+		
+		//Junk Mail
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.TOP);
+		groupCard = new GroupCard("Junk Mail",1,0,3,2,IMAGE_PATH + "JunkMail.png",GroupCard.Arrow.RIGHT,outwardArrows,GroupCard.Alignment.CRIMINAL);
+		deck.add(groupCard);
+		
+		//KGB
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.BOTTOM);
+		alignments = new ArrayList<GroupCard.Alignment>();
+		alignments.add(GroupCard.Alignment.COMMUNIST);
+		alignments.add(GroupCard.Alignment.VIOLENT);
+		groupCard = new GroupCard("KGB",2,2,6,0,IMAGE_PATH + "KGB.png",GroupCard.Arrow.RIGHT,outwardArrows,alignments);
+		deck.add(groupCard);
+		
+		//KKK
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.BOTTOM);
+		alignments = new ArrayList<GroupCard.Alignment>();
+		alignments.add(GroupCard.Alignment.CONSERVATIVE);
+		alignments.add(GroupCard.Alignment.VIOLENT);
+		groupCard = new GroupCard("KKK",2,0,5,1,IMAGE_PATH + "KKK.png",GroupCard.Arrow.RIGHT,outwardArrows,alignments);
+		deck.add(groupCard);
+		
+		//L-4 Society
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.LEFT);
+		groupCard = new GroupCard("L-4 Society",1,0,2,0,IMAGE_PATH + "L4Society.png",GroupCard.Arrow.RIGHT,outwardArrows,GroupCard.Alignment.WEIRD);
+		deck.add(groupCard);
+		
+		//Libertarians
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.TOP);
+		groupCard = new GroupCard("Libertarians",1,0,4,1,IMAGE_PATH + "Libertarians.png",GroupCard.Arrow.LEFT,outwardArrows,GroupCard.Alignment.FANATIC);
+		deck.add(groupCard);
+		
+		//Loan Sharks
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.RIGHT);
+		alignments = new ArrayList<GroupCard.Alignment>();
+		alignments.add(GroupCard.Alignment.CRIMINAL);
+		alignments.add(GroupCard.Alignment.VIOLENT);
+		groupCard = new GroupCard("Loan Sharks",5,0,5,6,IMAGE_PATH + "LoanSharks.png",GroupCard.Arrow.LEFT,outwardArrows,alignments);
+		deck.add(groupCard);
+		
+		//Local Police Departments
+		alignments = new ArrayList<GroupCard.Alignment>();
+		alignments.add(GroupCard.Alignment.CONSERVATIVE);
+		alignments.add(GroupCard.Alignment.STRAIGHT);
+		alignments.add(GroupCard.Alignment.VIOLENT);
+		groupCard = new GroupCard("Local Police Departments",0,0,4,1,IMAGE_PATH + "LocalPoliceDepartments.png",GroupCard.Arrow.LEFT,null,alignments);
+		deck.add(groupCard);
+		
+		//Madison Avenue
+		outwardArrows = new ArrayList<GroupCard.Arrow>();
+		outwardArrows.add(GroupCard.Arrow.LEFT);
+		outwardArrows.add(GroupCard.Arrow.BOTTOM);
+		//groupCard = new GroupCard("Madison Avenue",3,3,3,2,IMAGE_PATH + "MadisonAvenue.png",GroupCard.Arrow.RIGHT,outwardArrows,null);
+		//deck.add(groupCard);
+		
 		//The Mafia
 		ability = new BasicGroupAbility(Global.AbilityType.DIRECT_CONTROL, GroupCard.Alignment.CRIMINAL, Global.AttackType.CONTROL, 3);
 		outwardArrows = new ArrayList<GroupCard.Arrow>();
@@ -182,8 +442,8 @@ public class Deck {
 		outwardArrows = new ArrayList<GroupCard.Arrow>();
 		outwardArrows.add(GroupCard.Arrow.BOTTOM);
 		alignments = new ArrayList<GroupCard.Alignment>();
-		alignments.add(GroupCard.Aligmment.CONSERVATIVE);
-		alignemnts.add(GroupCard.Alignment.STRAIGHT);
+		alignments.add(GroupCard.Alignment.CONSERVATIVE);
+		alignments.add(GroupCard.Alignment.STRAIGHT);
 		alignments.add(GroupCard.Alignment.FANATIC);
 		groupCard = new GroupCard("Moral Minority",2,0,1,2, IMAGE_PATH + "MoralMinority.png", GroupCard.Arrow.RIGHT, outwardArrows, alignments);
 		deck.add(groupCard);
@@ -200,8 +460,8 @@ public class Deck {
 		outwardArrows.add(GroupCard.Arrow.TOP);
 		outwardArrows.add(GroupCard.Arrow.BOTTOM);
 		outwardArrows.add(GroupCard.Arrow.RIGHT);
-		groupCard = new GroupCard("Multinational Oil Companies",6,0,4,8, IMAGE_PATH + "MultinationalOilCompanies.png", GroupCard.Arrow.LEFT, outwardArrows, null);
-		deck.add(groupCard);
+		//groupCard = new GroupCard("Multinational Oil Companies",6,0,4,8, IMAGE_PATH + "MultinationalOilCompanies.png", GroupCard.Arrow.LEFT, outwardArrows, null);
+		//deck.add(groupCard);
 
 		//Nephews of God
 		alignments = new ArrayList<GroupCard.Alignment>();
@@ -236,7 +496,7 @@ public class Deck {
 		outwardArrows.add(GroupCard.Arrow.RIGHT);
 		alignments = new ArrayList<GroupCard.Alignment>();
 		alignments.add(GroupCard.Alignment.COMMUNIST);
-		groupcard = new GroupCard("Oribital Mind Control Lasers",4,2,5,0, IMAGE_PATH + "OrbitalMindControlLasers.png", GroupCard.Arrow.LEFT, outwardArrows, alignments);
+		groupCard = new GroupCard("Oribital Mind Control Lasers",4,2,5,0, IMAGE_PATH + "OrbitalMindControlLasers.png", GroupCard.Arrow.LEFT, outwardArrows, alignments);
 		deck.add(groupCard);
 
 		//Parent/TeacherAglomeration
@@ -244,7 +504,7 @@ public class Deck {
 		alignments.add(GroupCard.Alignment.PEACEFUL);
 		alignments.add(GroupCard.Alignment.CONSERVATIVE);
 		alignments.add(GroupCard.Alignment.STRAIGHT);
-		groupcard = new GroupCard("Parent/Teacher Aglomeration",0,0,5,1, IMAGE_PATH + "ParentTeacherAggolmeration.png", GroupCard.Arrow.LEFT, outwardArrows, alignments);
+		groupCard = new GroupCard("Parent/Teacher Aglomeration",0,0,5,1, IMAGE_PATH + "ParentTeacherAggolmeration.png", GroupCard.Arrow.LEFT, outwardArrows, alignments);
 		deck.add(groupCard);
 
 		//Pentagon
@@ -268,8 +528,8 @@ public class Deck {
 
 		//Phone Phreaks
 		alignments = new ArrayList<GroupCard.Alignment>();
-		alignments.add(GroupCard.Alignments.CRIMINAL);
-		alignments.add(GroupCard.Alignments.LIBERAL);
+		alignments.add(GroupCard.Alignment.CRIMINAL);
+		alignments.add(GroupCard.Alignment.LIBERAL);
 		groupCard = new GroupCard("Phone Phreaks",0,1,1,1, IMAGE_PATH + "PhonePhreaks.png", GroupCard.Arrow.LEFT, null, alignments);
 		deck.add(groupCard);
 
@@ -307,7 +567,7 @@ public class Deck {
 		outwardArrows = new ArrayList<GroupCard.Arrow>();
 		outwardArrows.add(GroupCard.Arrow.LEFT);
 		alignments = new ArrayList<GroupCard.Alignment>();
-		alignments.add(GroupCard.Alignment.LIBERAL)
+		alignments.add(GroupCard.Alignment.LIBERAL);
 		groupCard = new GroupCard("Recyclers",2,0,2,3,IMAGE_PATH + "Recyclers.png", GroupCard.Arrow.RIGHT, outwardArrows, alignments);
 		deck.add(groupCard);
 
@@ -335,7 +595,7 @@ public class Deck {
 		deck.add(groupCard);
 
 		//Semiconscious Liberation Army
-		alignments = new ArrayList<GroupCard.Alignments>();
+		alignments = new ArrayList<GroupCard.Alignment>();
 		alignments.add(GroupCard.Alignment.CRIMINAL);
 		alignments.add(GroupCard.Alignment.VIOLENT);
 		alignments.add(GroupCard.Alignment.LIBERAL);
@@ -373,7 +633,7 @@ public class Deck {
 		//Survivalists
 		alignments = new ArrayList<GroupCard.Alignment>();
 		alignments.add(GroupCard.Alignment.CONSERVATIVE);
-		alignments.add(GroupCard.ALignment.VIOLENT);
+		alignments.add(GroupCard.Alignment.VIOLENT);
 		alignments.add(GroupCard.Alignment.FANATIC);
 		groupCard = new GroupCard("Survivalists",0,0,6,2,IMAGE_PATH + "Survivalists.png", GroupCard.Arrow.RIGHT,null,alignments);
 		deck.add(groupCard);
@@ -382,7 +642,7 @@ public class Deck {
 		outwardArrows = new ArrayList<GroupCard.Arrow>();
 		outwardArrows.add(GroupCard.Arrow.TOP);
 		alignments = new ArrayList<GroupCard.Alignment>();
-		alignments.add(GroupCard.WEIRD);
+		alignments.add(GroupCard.Alignment.WEIRD);
 		groupCard = new GroupCard("Tabloids",2,0,3,3,IMAGE_PATH + "Tabloids.png",GroupCard.Arrow.RIGHT,outwardArrows,alignments);
 		deck.add(groupCard);
 
@@ -392,7 +652,7 @@ public class Deck {
 		outwardArrows.add(GroupCard.Arrow.RIGHT);
 		alignments = new ArrayList<GroupCard.Alignment>();
 		alignments.add(GroupCard.Alignment.VIOLENT);
-		alignments.add(GroupCard.Alignmnet.CONSERVATIVE);
+		alignments.add(GroupCard.Alignment.CONSERVATIVE);
 		alignments.add(GroupCard.Alignment.GOVERNMENT);
 		groupCard = new GroupCard("Texas",6,0,6,4,IMAGE_PATH + "Texas.png",GroupCard.Arrow.LEFT,outwardArrows,alignments);
 		deck.add(groupCard);
@@ -435,7 +695,7 @@ public class Deck {
 		//Undergroup Newspapers
 		outwardArrows = new ArrayList<GroupCard.Arrow>();
 		outwardArrows.add(GroupCard.Arrow.TOP);
-		alignments = new ArrayList<GroupCard.Alignment);
+		alignments = new ArrayList<GroupCard.Alignment>();
 		alignments.add(GroupCard.Alignment.COMMUNIST);
 		alignments.add(GroupCard.Alignment.LIBERAL);
 		groupCard = new GroupCard("Underground Newspapers",1,1,5,0,IMAGE_PATH + "UndergroundNewspapers.png",GroupCard.Arrow.RIGHT,outwardArrows,alignments);
@@ -444,7 +704,7 @@ public class Deck {
 		//The United Nations
 		outwardArrows = new ArrayList<GroupCard.Arrow>();
 		outwardArrows.add(GroupCard.Arrow.BOTTOM);
-		alignments = new ArrayList<GroupCard.Alignment);
+		alignments = new ArrayList<GroupCard.Alignment>();
 		alignments.add(GroupCard.Alignment.LIBERAL);
 		groupCard = new GroupCard("The United Nations",1,0,3,3,IMAGE_PATH + "TheUnitedNations.png",GroupCard.Arrow.LEFT,outwardArrows,alignments);
 		deck.add(groupCard);
@@ -452,13 +712,13 @@ public class Deck {
 		//Video Games
 		outwardArrows = new ArrayList<GroupCard.Arrow>();
 		outwardArrows.add(GroupCard.Arrow.BOTTOM);
-		groupCard = new GroupCard("Video Games",2,0,3,7,IMAGE_PATH + "VideoGames.png",GroupCard.Arrow.RIGHT,outwardArrows,null);
-		deck.add(groupCard);
+		//groupCard = new GroupCard("Video Games",2,0,3,7,IMAGE_PATH + "VideoGames.png",GroupCard.Arrow.RIGHT,outwardArrows,null);
+		//deck.add(groupCard);
 
 		//YUppies
 		outwardArrows = new ArrayList<GroupCard.Arrow>();
 		outwardArrows.add(GroupCard.Arrow.BOTTOM);
-		alignments = new ArrayList<GroupCard.Alignment);
+		alignments = new ArrayList<GroupCard.Alignment>();
 		alignments.add(GroupCard.Alignment.CONSERVATIVE);
 		groupCard = new GroupCard("Yuppies",1,1,4,5,IMAGE_PATH + "Yuppies.png",GroupCard.Arrow.RIGHT,outwardArrows,alignments);
 
@@ -566,6 +826,8 @@ public class Deck {
 		//White Collar Crime
 		specialCard = new SpecialCard("White Collar Crime", IMAGE_PATH + "WhiteCollarCrime.png");
 		deck.add(specialCard);
+	
+
 	}
 	
 	//Randomly returns an IlluminatiCard contained in illuminatiDeck
