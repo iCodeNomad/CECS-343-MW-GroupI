@@ -11,10 +11,10 @@ public class FieldGUI extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	
-	private final int PANEL_X = 6;
-	private final int PANEL_Y = 6;
-	private final int PANEL_WIDTH = 1043;
-	private final int PANEL_HEIGHT = 577;
+	private final int PANEL_X = 0;
+	private final int PANEL_Y = 0;
+	private final int PANEL_WIDTH = 1049;
+	private final int PANEL_HEIGHT = 583;
 	
 	//Grid variables
 	private final int GRID_MAX_HEIGHT = 19;
@@ -22,7 +22,7 @@ public class FieldGUI extends JPanel {
 	private final double WIDTH_UNIT = PANEL_WIDTH / GRID_MAX_WIDTH;
 	private final double HEIGHT_UNIT = PANEL_HEIGHT / GRID_MAX_HEIGHT;
 	protected HashMap<CardGUI, Rectangle> cards;
-	private CardGUI illuminati;
+	protected CardGUI illuminati;
 
 	public FieldGUI(CardGUI illuminati){
 		super();

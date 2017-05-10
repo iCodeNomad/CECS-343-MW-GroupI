@@ -3,6 +3,7 @@ import java.util.ArrayList;
 public class Player {
 	//Class Attributes
 	private String name;
+	private int playerNum;
 	private IlluminatiCard illuminati;
 	private ArrayList<GroupCard> groupCards;
 	private ArrayList<SpecialCard> specialCards;
@@ -33,21 +34,26 @@ public class Player {
 		return this.gui;
 	}
 	
+	public int PlayerNum(){
+		return this.playerNum;
+	}
+	
 	//Constructor Method
-	public Player(String name, GUI gui){
+	public Player(String name, GUI gui, int playerNum){
 		this.name = name;
 		this.gui = gui;
-		gui.player = this;
-		gui.initialize();
+		this.playerNum = playerNum;
 		
-		gui.Frame().setVisible(true);
+		SetIlluminati(GamePlay.deck.drawIlluminati());
+		
+		gui.player = this;
 		
 		groupCards = new ArrayList<GroupCard>();
 		specialCards = new ArrayList<SpecialCard>();
 	}
 	
 	//Adds Illuminati card to variable, sets Illuminati's owner to this player
-	public void SetIlluminati(IlluminatiCard illuminatiCard){
+	private void SetIlluminati(IlluminatiCard illuminatiCard){
 		if(this.illuminati == null){
 			this.illuminati = illuminatiCard;
 			illuminatiCard.owner = this;
@@ -70,15 +76,18 @@ public class Player {
 	
 	//Player draws a card from the deck
 	//Card is added to player's hand
-	public void DrawCard(Deck deck){
+	public MainDeckCard DrawCard(Deck deck){
 		MainDeckCard card = deck.drawCard();
 		
 		if(card instanceof GroupCard){
 			//TODO - Change this so it doesn't add a group to the player's hand
-			groupCards.add((GroupCard) card);
+			GamePlay.uncontrolledGroups.add((GroupCard) card);
+			GUI.uncontrolledGUI.update();
 		}else{
 			specialCards.add((SpecialCard) card);
 		}
+		
+		return card;
 	}
 		
 		

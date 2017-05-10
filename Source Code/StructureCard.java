@@ -139,6 +139,19 @@ public abstract class StructureCard extends Card{
 		return false;
 	}
 	
+	public boolean RemoveChild(GroupCard card){
+		if(children.containsValue(card)){
+			for(Arrow arrow: outwardArrows){
+				if(children.get(arrow) == card){
+					children.remove(arrow);
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
 	//Calculates the modifier based on attacker power and defender resistance (or defender power if attack to destroy)
 	public int CalculatePowerModifier(GroupCard defendingGroup, Global.AttackType attackType){
 		//Modifier for Society of Assassins and Servants of Cthulhu

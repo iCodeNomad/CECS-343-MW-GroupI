@@ -7,6 +7,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
@@ -15,8 +21,10 @@ import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
@@ -25,16 +33,16 @@ import javax.swing.border.LineBorder;
 public class GUI {
 
 	private JFrame frame;
-	private JTextField chatTextField;
 	private JTextField textField;
-	//private JTextField textField_1;
 	
-	private JPanel displayPanel;
+	private JLayeredPane displayPanel;
 	private FieldGUI gamePanel;
-	//private CardLayout cardLayout;
+	
+	//Uncontrolled groups area
+	public static UncontrolledGUI uncontrolledGUI;
 	
 	//Currently shows FieldGUI
-	private FieldGUI currentPanel;
+	private JPanel currentPanel;
 	
 	//Used to pass an arrow to the mouse handler in the popup
 	private StructureCard.Arrow actionArrow;
@@ -57,6 +65,18 @@ public class GUI {
 	//Text prompt for attack modifier in upper-right corner
 	private JLabel modifierPrompt;
 	
+	//ComboBox for selecting which field to look at
+	private JComboBox fieldSelection;
+	
+	//Client-server variables
+	private static int port = 81;
+	private static BufferedReader streamIn;
+    private static PrintStream streamOut;
+    private JTextField chatTextField;
+    private JTextArea textArea;
+    private JButton sendButton;
+    private JButton clearButton;
+	
 	public ArrayList<CardGUI> SelectedCards(){
 		return this.selectedCards;
 	}
@@ -65,10 +85,14 @@ public class GUI {
 		return this.frame;
 	}
 	
+	public FieldGUI GamePanel(){
+		return this.gamePanel;
+	}
+	
 	/**
 	 * Create the application.
 	 */
-	public GUI() {;
+	public GUI() {
 		
 	}
 
@@ -80,7 +104,7 @@ public class GUI {
 		gamePanelCards = new ArrayList<CardGUI>();
 		cardsPanelCards = new ArrayList<CardGUI>();
 		
-		frame = new JFrame();
+		frame = new JFrame(player.Name());
 		frame.setSize(1300, 800);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
@@ -95,15 +119,13 @@ public class GUI {
 		cardsPanel.setBounds(6, 601, 735, 111);
 		panel.add(cardsPanel);
 		cardsPanel.setLayout(null);
-
-		Deck deck = new Deck();
-		player.SetIlluminati(deck.drawIlluminati());
 		
 		CardGUI illuminatiGUI = new CardGUI(player.Illuminati(), 5, 10);
+		player.Illuminati().cardGUI = illuminatiGUI;
 		addEventHandler(illuminatiGUI);
 		
 		//Initialize Game Panel
-		displayPanel = new JPanel();
+		displayPanel = new JLayeredPane();
 		displayPanel.setBorder(new LineBorder(new Color(0, 0, 0), 3));
 		displayPanel.setBackground(new Color(255, 255, 240));
 		displayPanel.setBounds(6, 6, 1049, 583);
@@ -111,7 +133,7 @@ public class GUI {
 		displayPanel.setLayout(null);
 		
 		gamePanel = new FieldGUI(illuminatiGUI);
-		displayPanel.add(gamePanel);
+		displayPanel.add(gamePanel, 1);
 		
 		currentPanel = gamePanel;
 		
@@ -127,18 +149,9 @@ public class GUI {
 		fieldDeck.addMouseListener(new MouseAdapter(){
 			@Override
 			public void mouseClicked(MouseEvent e){
-				player.DrawCard(deck);
-				GenerateHand(player, cardsPanel);
-				frame.repaint();
+				drawCard();
 			}
 		});
-		
-		/*textField_1 = new JTextField();
-		textField_1.setText("$20");
-		textField_1.setBackground(UIManager.getColor("Button.select"));
-		textField_1.setBounds(470, 402, 35, 26);
-		gamePanel.add(textField_1);
-		textField_1.setColumns(10);*/
 		
 		JPanel rightSidePanel = new JPanel();
 		rightSidePanel.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -152,26 +165,42 @@ public class GUI {
 		rightSidePanel.add(lblOptions);
 		lblOptions.setFont(new Font("Lucida Grande", Font.BOLD | Font.ITALIC, 16));
 		
-		String[] fieldOptions = {"Player 1", "Player 2", "Player 3", "Uncontrolled Area"};
-		JComboBox fieldSelection = new JComboBox(fieldOptions);
+		String[] fieldOptions = new String[GamePlay.players.size() + 1];
+		for(int i = 0; i < GamePlay.players.size(); i++){
+			fieldOptions[i] = "Player " + (i + 1);
+			
+		}
+		fieldOptions[GamePlay.players.size()] = "Uncontrolled Area";
+		
+		fieldSelection = new JComboBox(fieldOptions);
+		fieldSelection.setSelectedIndex(player.PlayerNum());
 		fieldSelection.setBounds(6, 36, 222, 25);
 		rightSidePanel.add(fieldSelection);
 		fieldSelection.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e){
 				String response = (String) fieldSelection.getSelectedItem();
-				response = response.substring(response.length() - 1);
-				int playerNum = Integer.parseInt(response) - 1;
-				displayPanel.removeAll();
-				
-				displayPanel.add(GamePlay.players.get(playerNum).GUI().gamePanel);
-				frame.revalidate();
-				frame.repaint();
-				displayPanel.revalidate();
-				displayPanel.repaint();
-				currentPanel = GamePlay.players.get(playerNum).GUI().gamePanel;
-				System.out.println(playerNum);
-				//TODO - Finish switching game panels (uncontrolled area)
+				if(response != "Uncontrolled Area"){
+					response = response.substring(response.length() - 1);
+					int playerNum = Integer.parseInt(response) - 1;
+					displayPanel.remove(currentPanel);
+					
+					displayPanel.add(GamePlay.players.get(playerNum).GUI().gamePanel, 1);
+					frame.revalidate();
+					frame.repaint();
+					displayPanel.revalidate();
+					displayPanel.repaint();
+					currentPanel = GamePlay.players.get(playerNum).GUI().gamePanel;
+				}else{
+					displayPanel.remove(currentPanel);
+					
+					displayPanel.add(uncontrolledGUI, 1);
+					frame.revalidate();
+					frame.repaint();
+					displayPanel.revalidate();
+					displayPanel.repaint();
+					currentPanel = uncontrolledGUI;
+				}
 			}
 		});
 		
@@ -190,12 +219,13 @@ public class GUI {
 		rightSidePanel.add(lblChat);
 		lblChat.setFont(new Font("Lucida Grande", Font.BOLD | Font.ITALIC, 16));
 		
-		JTextPane chatPane = new JTextPane();
-		chatPane.setText("Player 1: Hi there.\nPlayer 1: I wish you the best, but i will win.\nPlayer 2: I dont think so.\nPlayer 1: haha will see.\nPlayer 2: kk\nPlayer 3: can you please hurry up and play");
-		chatPane.setBounds(6, 280, 220, 423);
-		rightSidePanel.add(chatPane);
-		chatPane.setForeground(Color.BLACK);
-		chatPane.setBackground(Color.WHITE);
+		textArea = new JTextArea();
+		textArea.setEditable(false);
+		textArea.setWrapStyleWord(true);
+		textArea.setBounds(6, 280, 220, 423);
+		textArea.setForeground(Color.BLACK);
+		textArea.setBackground(Color.WHITE);
+		rightSidePanel.add(textArea);
 		
 		chatTextField = new JTextField();
 		chatTextField.setBounds(6, 710, 220, 26);
@@ -204,16 +234,23 @@ public class GUI {
 		
 		JButton clearButton = new JButton("Clear");
 		clearButton.setBounds(133, 731, 93, 29);
+		clearButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				chatTextField.setText("");
+			}
+		});
 		rightSidePanel.add(clearButton);
 		
 		JButton sendButton = new JButton("Send");
 		sendButton.setBounds(6, 731, 130, 29);
-		rightSidePanel.add(sendButton);
-		clearButton.addActionListener(new ActionListener() {
+		sendButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//
+				streamOut.println(player.Name() + ": " + chatTextField.getText());
+				chatTextField.setText("");
 			}
 		});
+		rightSidePanel.add(sendButton);
+		
 		
 		JPanel playerActionsPanel = new JPanel();
 		playerActionsPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -225,14 +262,14 @@ public class GUI {
 		btnNext.setBounds(153, 38, 130, 29);
 		playerActionsPanel.add(btnNext);
 		
-		JLabel lblCardActionsJ = new JLabel("Player Actions ");
+		JLabel lblCardActionsJ = new JLabel("Player Actions");
 		lblCardActionsJ.setBounds(6, 6, 121, 20);
 		playerActionsPanel.add(lblCardActionsJ);
 		lblCardActionsJ.setFont(new Font("Lucida Grande", Font.BOLD, 16));
 		
-		JButton btnAttack = new JButton("Move Money");
-		btnAttack.setBounds(10, 67, 130, 29);
-		playerActionsPanel.add(btnAttack);
+		JButton btnMoveMoney = new JButton("Move Money");
+		btnMoveMoney.setBounds(10, 67, 130, 29);
+		playerActionsPanel.add(btnMoveMoney);
 		
 		JButton btnGiveAGroup = new JButton("Give a Group");
 		btnGiveAGroup.setBounds(153, 67, 130, 29);
@@ -242,23 +279,24 @@ public class GUI {
 		btnDropAGroup.setBounds(153, 96, 130, 29);
 		playerActionsPanel.add(btnDropAGroup);
 		
-		JButton btnAttack_1 = new JButton("Attack");
-		btnAttack_1.setBounds(11, 38, 130, 29);
-		playerActionsPanel.add(btnAttack_1);
-		btnAttack_1.addActionListener(new ActionListener() {
-			
+		JButton btnAttack = new JButton("Attack");
+		btnAttack.setBounds(11, 38, 130, 29);
+		playerActionsPanel.add(btnAttack);
+		btnAttack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				SwingUtilities.invokeLater(new Runnable(){
-					public void run(){
-						Thread qthread = new Thread(){
-							public void run(){
-								GamePlay.attack(player);
-							}
-						};
-						
-						qthread.start();
-					}
-				});
+				if(Global.isMainPhase && GamePlay.activePlayer == player){
+					SwingUtilities.invokeLater(new Runnable(){
+						public void run(){
+							Thread qthread = new Thread(){
+								public void run(){
+									GamePlay.attack(player);
+								}
+							};
+							
+							qthread.start();
+						}
+					});
+				}
 			}
 		});
 		
@@ -272,6 +310,17 @@ public class GUI {
 		
 		JButton btnNextTurn = new JButton("Done");
 		btnNextTurn.setBounds(153, 136, 130, 29);
+		btnNextTurn.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+				if(Global.isMainPhase && GamePlay.activePlayer == player){
+					if(GamePlay.remainingActions == 2){
+						GamePlay.activePlayer.Illuminati().addMoney(5);
+					}
+					GamePlay.remainingActions = 0;
+					Global.isMainPhase = false;
+				}
+			}
+		});
 		playerActionsPanel.add(btnNextTurn);
 		
 		JPanel panel_1 = new JPanel();
@@ -289,42 +338,33 @@ public class GUI {
 		textField.setBounds(99, 1, 130, 26);
 		panel_1.add(textField);
 		textField.setColumns(10);
-		btnNext.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		
+		Thread chatThread = new Thread(){
+			public void run(){
+				try{
+					connect();
+				}catch(IOException e){
+					e.printStackTrace();
+				}
 			}
-		});
+		};
+		
+		chatThread.start();
 	}
 	
 	public void GenerateHand(Player player, JPanel panel){
 		panel.removeAll();
 		panel.updateUI();
-		ArrayList<GroupCard> groups = player.GroupCards();
 		ArrayList<SpecialCard> specials = player.SpecialCards();
 		
 		cardsPanelCards = new ArrayList<CardGUI>();
 		selectedCards = new ArrayList<CardGUI>();
 		
 		int xOffset = 4;
-		
-		for(Card card: groups){
-			CardGUI cardGUI = new CardGUI(card, panel, xOffset, 10);
-			cardGUI.addMouseListener(new MouseAdapter(){
-				@Override
-				public void mouseClicked(MouseEvent e){
-					if(!selectedCards.contains(cardGUI)){
-						selectedCards.add(cardGUI);
-					}else{
-						selectedCards.remove(cardGUI);
-					}
-				}
-			});
-			panel.add(cardGUI);
-			cardsPanelCards.add(cardGUI);
-			
-			xOffset += 154;
-		}
+
 		for(Card card: specials){
 			CardGUI cardGUI = new CardGUI(card, panel, xOffset, 10);
+			card.cardGUI = cardGUI;
 			cardGUI.addMouseListener(new MouseAdapter(){
 				@Override
 				public void mouseClicked(MouseEvent e){
@@ -347,20 +387,24 @@ public class GUI {
 	private CardGUI addChild(StructureCard parent, StructureCard child, StructureCard.Arrow arrow){
 		parent.AddChild((GroupCard) child, arrow);
 		CardGUI childGUI = new CardGUI(child, gamePanel, 0, 0);
-		gamePanel.addCard(childGUI, new CardGUI(parent, gamePanel, 0, 0));
+		child.cardGUI = childGUI;
+		//gamePanel.addCard(childGUI, new CardGUI(parent, gamePanel, 0, 0));
+		gamePanel.addCard(childGUI, parent.cardGUI());
 		gamePanelCards.add(childGUI);
 		
 		return childGUI;
 	}
 	
-	private void addEventHandler(CardGUI card){
+	public void addEventHandler(CardGUI card){
 		card.addMouseListener(new MouseAdapter(){
 			@Override
 			public void mouseClicked(MouseEvent e){
-				if(Global.selectionPhase == Global.SelectionPhase.ADD_CHILD){
+				/*if(Global.selectionPhase == Global.SelectionPhase.ADD_CHILD){
 					parentControlArrowPopup((StructureCard) card.Card());
-				}else if(Global.selectionPhase == Global.SelectionPhase.SELECT_ATTACKING_GROUP){
+				}else*/ if(Global.selectionPhase == Global.SelectionPhase.SELECT_ATTACKING_GROUP){
 					designateAttackingGroup((StructureCard) card.Card());
+				}else if(Global.selectionPhase == Global.SelectionPhase.SELECT_DEFENDING_GROUP){
+					designateDefendingGroup((StructureCard) card.Card());
 				}else if(Global.selectionPhase == Global.SelectionPhase.SELECT_AIDING_GROUPS){
 					designateAidingGroup((StructureCard) card.Card());
 				}
@@ -370,16 +414,85 @@ public class GUI {
 	
 	//-------------------------------------Card Selection Effects-------------------------------
 	
+	private void drawCard(){
+		if(GamePlay.activePlayer == player && Global.selectionPhase == Global.SelectionPhase.DRAW_CARD){
+			player.DrawCard(GamePlay.deck);
+			GenerateHand(player, cardsPanel);
+			frame.repaint();
+			
+			Global.selectionPhase = Global.SelectionPhase.NONE;
+			
+			for(CardGUI c: uncontrolledGUI.cards){
+				addEventHandler(c);
+			}
+		}
+	}
+	
 	private void designateAttackingGroup(StructureCard card){
-		if(card.AttackCounter() > 0){
-			if(card.Power() == 0){
-				DialogBox("This group has no power and cannot attack!");
+		
+		if (card == GamePlay.attackingPlayer.Illuminati() || GamePlay.attackingPlayer.GroupCards().contains(card)){
+			if(card.AttackCounter() > 0){
+				if(card.Power() == 0){
+					DialogBox("This group has no power and cannot attack!");
+				}else{
+					GamePlay.attackingGroup = card;
+					Global.selectionPhase = Global.SelectionPhase.NONE;
+				}
 			}else{
-				GamePlay.attackingGroup = card;
-				Global.selectionPhase = Global.SelectionPhase.NONE;
+				DialogBox("This group has no attacks remaining!");
 			}
 		}else{
-			DialogBox("This group has no attacks remaining!");
+			DialogBox("You do not control this group!");
+		}
+	}
+	
+	private void designateDefendingGroup(StructureCard card){
+		if(GamePlay.defendingPlayer != null && GamePlay.defendingPlayer.Illuminati().Name().equals("The Discordian Society") && checkDiscordian(card)){
+			DialogBox("The Discordian Society is immune to this card.");
+		}else{
+			if(card == GamePlay.attackingGroup){
+				DialogBox("A group cannot attack itself!");
+			}else if(card instanceof IlluminatiCard){
+				DialogBox("You cannot attack an Illuminati!");
+			}else{
+				if(GamePlay.attackType == Global.AttackType.CONTROL){
+					if(GamePlay.attackingPlayer.GroupCards().contains(card)){
+						DialogBox("You already control this group!");
+					}else{
+						GamePlay.defendingGroup = (GroupCard) card;
+						Global.selectionPhase = Global.SelectionPhase.NONE;
+						player.GUI().fieldSelection.setSelectedItem(GamePlay.attackingPlayer.Name());
+					}
+				}else if(GamePlay.attackType == Global.AttackType.NEUTRALIZE){
+					if(card.Owner() == null){
+						DialogBox("You cannot neutralize an uncontrolled group!");
+					}else{
+						GamePlay.defendingGroup = (GroupCard) card;
+						Global.selectionPhase = Global.SelectionPhase.NONE;
+						player.GUI().fieldSelection.setSelectedItem(GamePlay.attackingPlayer.Name());
+					}
+				}else{		//Destroy
+					if(card.Power() == 0){
+						DialogBox("You cannot destroy a group with no power!");
+					}else{
+						GamePlay.defendingGroup = (GroupCard) card;
+						Global.selectionPhase = Global.SelectionPhase.NONE;
+						player.GUI().fieldSelection.setSelectedItem(GamePlay.attackingPlayer.Name());
+					}
+				}
+			}
+		}
+	}
+	
+	private boolean checkDiscordian(StructureCard card){
+		if(card instanceof GroupCard){
+			if(((GroupCard) card).hasAlignment(GroupCard.Alignment.GOVERNMENT) || ((GroupCard) card).hasAlignment(GroupCard.Alignment.STRAIGHT)){
+				return true;
+			}else{
+				return false;
+			}
+		}else{
+			return false;
 		}
 	}
 	
@@ -421,17 +534,29 @@ public class GUI {
 	
 	//Creates a label in the top left corner of the game field, to prompt the user to do something
 	public void createPrompt(String s){
+		if(cornerPrompt != null){
+			gamePanel.remove(cornerPrompt);
+			cornerPrompt.setVisible(false);
+			cornerPrompt = null;
+		}
+		
 		cornerPrompt = new JLabel(s);
 		cornerPrompt.setBounds(6, 6, 500, 25);
 		cornerPrompt.setFont(cornerPrompt.getFont().deriveFont(20.0f));
 		cornerPrompt.setForeground(new Color(255, 50, 50));
 		gamePanel.add(cornerPrompt);
+		
+		gamePanel.revalidate();
+		gamePanel.repaint();
 	}
 	
 	//Removes the label in the top left corner
 	public void removePrompt(){
-		cornerPrompt.setVisible(false);
-		cornerPrompt = null;
+		if(cornerPrompt != null){
+			gamePanel.remove(cornerPrompt);
+			cornerPrompt.setVisible(false);
+			cornerPrompt = null;
+		}
 	}
 	
 	private JFrame CreateGenericPopup(){
@@ -489,51 +614,51 @@ public class GUI {
 		JOptionPane.showMessageDialog(null, "<html><body style = 'width: 250 px'>" + s);
 	}
 	
-	public void parentControlArrowPopup(StructureCard parent){
-		if(selectedCards.size() > 0){
-			JFrame popup = CreateGenericPopup();
-			
-			JPanel popupPanel = CreateGenericPanel();
-			popup.add(popupPanel);
-			
-			ArrayList<JButton> buttons = new ArrayList<JButton>();
-			
-			JLabel title = new JLabel("Pick a Control Arrow:");
-			title.setBounds(100, 30, 300, 16);
-			popupPanel.add(title);
-			
-			for(StructureCard.Arrow arrow: parent.OutwardArrows()){
-				buttons.add(buttons.size(), new JButton(arrow.toString()));
-			}
-			
-			int yOffset = 60;
-			
-			for(int i = 0; i < buttons.size(); i++){
-				buttons.get(i).setBounds(new Rectangle(10, yOffset, 280, 30));
-				popupPanel.add(buttons.get(i));
-				
-				if(buttons.get(i).getText() == "TOP"){
-					actionArrow = StructureCard.Arrow.TOP;
-				}else if(buttons.get(i).getText() == "RIGHT"){
-					actionArrow = StructureCard.Arrow.RIGHT;
-				}else if(buttons.get(i).getText() == "LEFT"){
-					actionArrow = StructureCard.Arrow.LEFT;
-				}else{
-					actionArrow = StructureCard.Arrow.BOTTOM;
-				}
-				
-				buttons.get(i).addActionListener(new ArrowButtonListener(parent, actionArrow, popup));
-				
-				yOffset += 40;
-			}
-			
-			yOffset += 50;
-			
-			JButton btnCancel = CreateCancelButton(popup);
-			popupPanel.add(btnCancel);
-			
-			frame.repaint();
+	public void parentControlArrowPopup(StructureCard parent, GroupCard child){
+		JFrame popup = CreateGenericPopup();
+		
+		JPanel popupPanel = CreateGenericPanel();
+		popup.add(popupPanel);
+		
+		ArrayList<JButton> buttons = new ArrayList<JButton>();
+		
+		JLabel title = new JLabel("Pick a Control Arrow:");
+		title.setBounds(100, 30, 300, 16);
+		popupPanel.add(title);
+		
+		for(StructureCard.Arrow arrow: parent.OutwardArrows()){
+			buttons.add(buttons.size(), new JButton(arrow.toString()));
 		}
+		
+		int yOffset = 60;
+		
+		for(int i = 0; i < buttons.size(); i++){
+			buttons.get(i).setBounds(new Rectangle(10, yOffset, 280, 30));
+			popupPanel.add(buttons.get(i));
+			
+			if(buttons.get(i).getText() == "TOP"){
+				actionArrow = StructureCard.Arrow.TOP;
+			}else if(buttons.get(i).getText() == "RIGHT"){
+				actionArrow = StructureCard.Arrow.RIGHT;
+			}else if(buttons.get(i).getText() == "LEFT"){
+				actionArrow = StructureCard.Arrow.LEFT;
+			}else{
+				actionArrow = StructureCard.Arrow.BOTTOM;
+			}
+			
+			buttons.get(i).addActionListener(new ArrowButtonListener(parent, actionArrow, popup, child));
+			
+			yOffset += 40;
+		}
+		
+		yOffset += 50;
+		
+		/*JButton btnCancel = CreateCancelButton(popup);
+		popupPanel.add(btnCancel);*/
+		
+		child.owner = parent.Owner();
+		
+		frame.repaint();
 	}
 	
 	public Global.AttackType AttackTypePopup(){
@@ -611,7 +736,7 @@ public class GUI {
 		int groupVal = Integer.MAX_VALUE;
 		
 		while(groupVal == Integer.MAX_VALUE){
-			input = (String) JOptionPane.showInputDialog(frame, "How much money will the attacking group spend on the attack? (Amount of MB in treasury: " + attackingGroup.CurrentMoney() + ")", "Spend Money", JOptionPane.PLAIN_MESSAGE, null, null, "0");
+			input = (String) JOptionPane.showInputDialog(frame, GamePlay.attackingPlayer.Name() + ": How much money will the attacking group spend on the attack? (Amount of MB in treasury: " + attackingGroup.CurrentMoney() + ")", "Spend Money", JOptionPane.PLAIN_MESSAGE, null, null, "0");
 			try{
 				groupVal = Integer.parseInt(input);
 				
@@ -630,6 +755,7 @@ public class GUI {
 			}
 		}
 		
+		System.out.println(groupVal);
 		attackingGroup.removeMoney(groupVal);
 		
 		int illuminatiVal = 0;
@@ -638,7 +764,7 @@ public class GUI {
 			illuminatiVal = Integer.MAX_VALUE;
 			
 			while(illuminatiVal == Integer.MAX_VALUE){
-				input = (String) JOptionPane.showInputDialog(frame, "How much money will the Illuminati spend on the attack? (Amount of MB in treasury: " + illuminatiCard.CurrentMoney() + ")", "Spend Money", JOptionPane.PLAIN_MESSAGE, null, null, "0");
+				input = (String) JOptionPane.showInputDialog(frame, GamePlay.attackingPlayer.Name() + ": How much money will the Illuminati spend on the attack? (Amount of MB in treasury: " + illuminatiCard.CurrentMoney() + ")", "Spend Money", JOptionPane.PLAIN_MESSAGE, null, null, "0");
 				try{
 					illuminatiVal = Integer.parseInt(input);
 					
@@ -669,7 +795,7 @@ public class GUI {
 		int groupVal = Integer.MAX_VALUE;
 		
 		while(groupVal == Integer.MAX_VALUE){
-			input = (String) JOptionPane.showInputDialog(frame, "How much money will the defennding group spend on the attack? (Amount of MB in treasury: " + defendingGroup.CurrentMoney() + ")", "Spend Money", JOptionPane.PLAIN_MESSAGE, null, null, "0");
+			input = (String) JOptionPane.showInputDialog(frame, GamePlay.defendingPlayer.Name() + ": How much money will the defending group spend on the attack? (Amount of MB in treasury: " + defendingGroup.CurrentMoney() + ")", "Spend Money", JOptionPane.PLAIN_MESSAGE, null, null, "0");
 			try{
 				groupVal = Integer.parseInt(input);
 				
@@ -696,7 +822,7 @@ public class GUI {
 			illuminatiVal = Integer.MAX_VALUE;
 			
 			while(illuminatiVal == Integer.MAX_VALUE){
-				input = (String) JOptionPane.showInputDialog(frame, "How much money will the Illuminati spend on the attack? (Amount of MB in treasury: " + illuminatiCard.CurrentMoney() + ")", "Spend Money", JOptionPane.PLAIN_MESSAGE, null, null, "0");
+				input = (String) JOptionPane.showInputDialog(frame, GamePlay.defendingPlayer.Name() + ": How much money will the Illuminati spend on the attack? (Amount of MB in treasury: " + illuminatiCard.CurrentMoney() + ")", "Spend Money", JOptionPane.PLAIN_MESSAGE, null, null, "0");
 				try{
 					illuminatiVal = Integer.parseInt(input);
 					
@@ -722,63 +848,63 @@ public class GUI {
 	}
 	
 	//Interference Spending Popup
-		public int InterferenceSpendingPopup(IlluminatiCard illuminatiCard){
-			String input;
-			int assistingVal = Integer.MAX_VALUE;
+	public int InterferenceSpendingPopup(IlluminatiCard illuminatiCard){
+		String input;
+		int assistingVal = Integer.MAX_VALUE;
+		
+		while(assistingVal == Integer.MAX_VALUE){
+			input = (String) JOptionPane.showInputDialog(frame, player.Name() + ": How much money will your Illuminati spend on assisting the attack? (Amount of MB in treasury: " + illuminatiCard.CurrentMoney() + ")", "Spend Money", JOptionPane.PLAIN_MESSAGE, null, null, "0");
+			try{
+				assistingVal = Integer.parseInt(input);
+				
+				if(assistingVal > illuminatiCard.CurrentMoney()){
+					DialogBox("The Illuminati does not have enough MB.");
+					assistingVal = Integer.MAX_VALUE;
+				}
+				
+				if(assistingVal < 0){
+					DialogBox("The number cannnot be negative!");
+					assistingVal = Integer.MAX_VALUE;
+				}
+				
+			}catch (NumberFormatException e){
+				DialogBox("Invalid input. Please try again");
+			}
+		}
+		
+		illuminatiCard.removeMoney(assistingVal);
+		
+		int interferingVal = 0;
+		
+		if(assistingVal == 0){
 			
-			while(assistingVal == Integer.MAX_VALUE){
-				input = (String) JOptionPane.showInputDialog(frame, "How much money will your Illuminati spend on assisting the attack? (Amount of MB in treasury: " + illuminatiCard.CurrentMoney() + ")", "Spend Money", JOptionPane.PLAIN_MESSAGE, null, null, "0");
+			interferingVal = Integer.MAX_VALUE;
+			
+			while(interferingVal == Integer.MAX_VALUE){
+				input = (String) JOptionPane.showInputDialog(frame, player.Name() + ": How much money will your Illuminati spend on interfering in the attack? (Amount of MB in treasury: " + illuminatiCard.CurrentMoney() + ")", "Spend Money", JOptionPane.PLAIN_MESSAGE, null, null, "0");
 				try{
-					assistingVal = Integer.parseInt(input);
+					interferingVal = Integer.parseInt(input);
 					
-					if(assistingVal > illuminatiCard.CurrentMoney()){
+					if(interferingVal > illuminatiCard.CurrentMoney()){
 						DialogBox("The Illuminati does not have enough MB.");
-						assistingVal = Integer.MAX_VALUE;
+						interferingVal = Integer.MAX_VALUE;
 					}
 					
-					if(assistingVal < 0){
+					if(interferingVal < 0){
 						DialogBox("The number cannnot be negative!");
-						assistingVal = Integer.MAX_VALUE;
+						interferingVal = Integer.MAX_VALUE;
 					}
 					
 				}catch (NumberFormatException e){
 					DialogBox("Invalid input. Please try again");
 				}
 			}
-			
-			illuminatiCard.removeMoney(assistingVal);
-			
-			int interferingVal = 0;
-			
-			if(assistingVal == 0){
-				
-				interferingVal = Integer.MAX_VALUE;
-				
-				while(interferingVal == Integer.MAX_VALUE){
-					input = (String) JOptionPane.showInputDialog(frame, "How much money will your Illuminati spend on interfering in the attack? (Amount of MB in treasury: " + illuminatiCard.CurrentMoney() + ")", "Spend Money", JOptionPane.PLAIN_MESSAGE, null, null, "0");
-					try{
-						interferingVal = Integer.parseInt(input);
-						
-						if(interferingVal > illuminatiCard.CurrentMoney()){
-							DialogBox("The Illuminati does not have enough MB.");
-							interferingVal = Integer.MAX_VALUE;
-						}
-						
-						if(interferingVal < 0){
-							DialogBox("The number cannnot be negative!");
-							interferingVal = Integer.MAX_VALUE;
-						}
-						
-					}catch (NumberFormatException e){
-						DialogBox("Invalid input. Please try again");
-					}
-				}
-			}
-			
-			illuminatiCard.removeMoney(interferingVal);
-			
-			return assistingVal - interferingVal;
 		}
+		
+		illuminatiCard.removeMoney(interferingVal);
+		
+		return assistingVal - interferingVal;
+	}
 	
 	//------------------------------------------Action Listeners-------------------------------------
 	
@@ -786,37 +912,36 @@ public class GUI {
 		private StructureCard.Arrow arrow;
 		private StructureCard parent;
 		private JFrame popup;
+		private GroupCard child;
 		
-		public ArrowButtonListener(StructureCard parent, StructureCard.Arrow arrow, JFrame popup){
+		public ArrowButtonListener(StructureCard parent, StructureCard.Arrow arrow, JFrame popup, GroupCard child){
 			this.arrow = arrow;
 			this.parent = parent;
 			this.popup = popup;
+			this.child = child;
 		}		
 		
 		public void actionPerformed(ActionEvent e){
-			System.out.println(arrow);
-			CardGUI child = addChild(parent, (GroupCard) selectedCards.get(0).Card(), arrow);
+			CardGUI childGUI = addChild(parent, child, arrow);
 			
-			//Will be unnecessary, simply for basic playability
-			player.RemoveGroupCard((GroupCard) selectedCards.get(0).Card());
-			GenerateHand(player, cardsPanel);
-			//End unnecessary parts
-			
-			child.addMouseListener(new MouseAdapter(){
+			childGUI.addMouseListener(new MouseAdapter(){
 				@Override
 				public void mouseClicked(MouseEvent e){
-					if(Global.selectionPhase == Global.SelectionPhase.ADD_CHILD){
+					/*if(Global.selectionPhase == Global.SelectionPhase.ADD_CHILD){
 						parentControlArrowPopup((StructureCard) child.Card());
-					}else if(Global.selectionPhase == Global.SelectionPhase.SELECT_ATTACKING_GROUP){
-						designateAttackingGroup((StructureCard) child.Card());
+					}else*/ if(Global.selectionPhase == Global.SelectionPhase.SELECT_ATTACKING_GROUP){
+						designateAttackingGroup(child);
+					}else if(Global.selectionPhase == Global.SelectionPhase.SELECT_DEFENDING_GROUP){
+						designateDefendingGroup(child);
 					}else if(Global.selectionPhase == Global.SelectionPhase.SELECT_AIDING_GROUPS){
-						designateAidingGroup((StructureCard) child.Card());
+						designateAidingGroup(child);
 					}
-					//selectedCard = null;
 				}
 			});
 			
-			((GroupCard) child.Card()).attackCounter = 1;
+			child.attackCounter = 1;
+			
+			Global.selectionPhase = Global.SelectionPhase.NONE;
 			
 			popup.setVisible(false);
 			popup.dispose();
@@ -827,16 +952,37 @@ public class GUI {
 	private JButton btnEndAttack;
 	
 	//Create a label to show the attack modifier as the players' actions update it FOR ALL PLAYERS
-	public static void outputAttackModifier(ArrayList<Player> players){
+	public static void outputAttackModifier(ArrayList<Player> players, int adjustment){
 		
 		for(Player p: players){
-			p.GUI().modifierPrompt = new JLabel("Attack modifier: " + GamePlay.attackModifier);
+			if(p.GUI().modifierPrompt != null){
+				p.GUI().modifierPrompt.setVisible(false);
+				p.GUI().gamePanel.remove(p.GUI().modifierPrompt);
+				p.GUI().modifierPrompt = null;
+			}
+			p.GUI().modifierPrompt = new JLabel("Attack modifier: " + (GamePlay.attackModifier + adjustment));
 			p.GUI().modifierPrompt.setBounds(850, 6, 500, 25);
 			p.GUI().modifierPrompt.setFont(p.GUI().modifierPrompt.getFont().deriveFont(20.0f));
 			p.GUI().modifierPrompt.setForeground(new Color(255, 50, 50));
 			p.GUI().gamePanel.add(p.GUI().modifierPrompt);
 			
+			p.GUI().displayPanel.revalidate();
+			p.GUI().displayPanel.repaint();
 			p.GUI().frame.repaint();
+		}
+	}
+	
+	public static void outputAttackModifier(ArrayList<Player> players){
+		outputAttackModifier(players, 0);
+	}
+	
+	public static void removeAttackModifier(ArrayList<Player> players){
+		for(Player p: players){
+			if(p.GUI().modifierPrompt != null){
+				p.GUI().modifierPrompt.setVisible(false);
+				p.GUI().gamePanel.remove(p.GUI().modifierPrompt);
+				p.GUI().modifierPrompt = null;
+			}
 		}
 	}
 	
@@ -849,7 +995,9 @@ public class GUI {
 				btnEndAttack.setVisible(false);
 				btnEndAttack = null;
 				
-				//TODO - Actually end the attack
+				Global.isAttackPhase = false;
+				
+				removePrompt();
 			}
 		});
 		
@@ -875,6 +1023,7 @@ public class GUI {
 	
 	public void removeEndAttackButton(){
 		if(btnEndAttack != null){
+			gamePanel.remove(btnEndAttack);
 			btnEndAttack.setVisible(false);
 			btnEndAttack = null;
 		}
@@ -883,4 +1032,31 @@ public class GUI {
 	public void refreshAll(){
 		GenerateHand(player, cardsPanel);
 	}
+	
+	public static void createUncontrolledGUI(){
+		uncontrolledGUI = new UncontrolledGUI();
+	}
+	
+	//---------------------------Server-client connection------------------------------------------
+	private String getUsername(){
+        return JOptionPane.showInputDialog(frame, "Name:", "Welcome to Chat", JOptionPane.QUESTION_MESSAGE);
+    }
+	
+	private void connect() throws IOException{
+        Socket clientSocket = new Socket(InetAddress.getByName(null), port);
+        streamIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        streamOut = new PrintStream(clientSocket.getOutputStream(), true);
+    
+        while(true){
+            String line = streamIn.readLine();
+            if(line.startsWith("Username")){
+                streamOut.println(getUsername());
+            }else if(line.startsWith("Welcome")){
+            	chatTextField.setEditable(true);
+            }else if(line.startsWith("From")){
+            	textArea.append(line.substring(6)+ "\n"); // output
+            }
+        }   
+    }
+
 }

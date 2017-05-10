@@ -18,7 +18,7 @@ public class GroupCard extends StructureCard implements MainDeckCard{
 	protected StructureCard BSDparent;
 	
 	//BasicGroupAbility needs to be in an array list because one card has two different abilities with different amounts.
-	protected ArrayList<BasicGroupAbility> abilities;
+	protected ArrayList<BasicGroupAbility> abilities = new ArrayList<BasicGroupAbility>();
 	
 	//Accessor Methods
 	public ArrayList<Alignment> Alignments(){
@@ -78,9 +78,9 @@ public class GroupCard extends StructureCard implements MainDeckCard{
 	}
 	
 	public GroupCard(String name, int power, int transferablePower, int resistance, int income, 
-			 String imagePath, Arrow inwardArrow, ArrayList<Arrow> outwardArrows, Alignment alignment, ArrayList<BasicGroupAbility> abilities) {
+			 String imagePath, Arrow inwardArrow, ArrayList<Arrow> outwardArrows, ArrayList<Alignment> alignments, ArrayList<BasicGroupAbility> abilities) {
 		
-		this(name, power, transferablePower, resistance, income, imagePath, inwardArrow, outwardArrows, alignment);
+		this(name, power, transferablePower, resistance, income, imagePath, inwardArrow, outwardArrows, alignments);
 		
 		this.abilities = abilities;
 	}
@@ -293,18 +293,5 @@ public class GroupCard extends StructureCard implements MainDeckCard{
             end
         end
     end*/
-	}
-
-	/*@Override
-	public String toString() {
-		return "GroupCard [alignments=" + alignments + ", parent=" + parent + ", parentArrow=" + parentArrow
-				+ ", resistance=" + resistance + ", BSDparent=" + BSDparent + ", abilities=" + abilities + ", power="
-				+ power + ", transferablePower=" + transferablePower + ", income=" + income + ", inwardArrow="
-				+ inwardArrow + ", outwardArrows=" + outwardArrows + ", children=" + children + ", owner=" + owner
-				+ ", attackCounter=" + attackCounter + ", currentMoney=" + currentMoney + ", rotation=" + rotation
-				+ ", distanceFromIlluminati=" + distanceFromIlluminati + ", name=" + name + ", imagePath=" + imagePath
-				+ "]";
-	}*/
-	
-	
+	}	
 }

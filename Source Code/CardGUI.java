@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
@@ -20,6 +21,7 @@ public class CardGUI extends JLabel {
 	private Card card;
 	private Rectangle rectField;
 	private JPanel panel;
+	private JLabel incomeText;
 	
 	public Card Card(){
 		return this.card;
@@ -49,6 +51,10 @@ public class CardGUI extends JLabel {
 		this.panel = panel;
 		
 		setImage(card.ImagePath());
+		
+		if(card instanceof StructureCard){
+			updateMoney();
+		}
 	}
 	
 	public CardGUI(Card card, JPanel panel){
@@ -64,9 +70,6 @@ public class CardGUI extends JLabel {
 	}
 	
 	public void setImage(String newImgPath){
-		/*ImageIcon imageIcon = new ImageIcon(newImgPath);
-		Image image = imageIcon.getImage().getScaledInstance(this.getWidth(), this.getHeight(), Image.SCALE_SMOOTH);
-		this.setIcon(new ImageIcon(image));*/
 		BufferedImage image = null;
 		try{
 			image = ImageIO.read(new File(newImgPath));
@@ -105,6 +108,29 @@ public class CardGUI extends JLabel {
 	    g.drawRenderedImage(image, null);
 	    g.dispose();
 	    return result;
+	}
+	
+	public void updateMoney(){
+		if(incomeText != null){
+			this.remove(incomeText);
+		}
+		
+		Integer money = new Integer(((StructureCard) card).CurrentMoney());
+		incomeText = new JLabel(money.toString());
+		incomeText.setBounds(5, 5, 30, 15);
+		incomeText.setFont(incomeText.getFont().deriveFont(16.0f));
+		incomeText.setForeground(new Color(255, 255, 255));
+		incomeText.setBackground(new Color(255, 255, 255));
+		this.add(incomeText);
+		
+		this.revalidate();
+		this.repaint();
+	}
+
+	@Override
+	public String toString() {
+		return "CardGUI [card=" + card + ", rectField=" + rectField + ", panel=" + panel + ", incomeText=" + incomeText
+				+ "]";
 	}
 	
 	//Places the card on FieldGUI, based on center point P
