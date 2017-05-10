@@ -28,7 +28,6 @@ public class Deck {
 	//Called once in the constructor
 	private void createDeck(){
 		
-		
 		//******************Ryan will add the following:****************************
 				//DONE ALREADY - NOT IN PAGE ORDER: Nuclear Power Companies, The Mafia
 				//NEED TO ADD Orbital Mind Control Lasers, Punk Rockers, Post Office
@@ -59,7 +58,7 @@ public class Deck {
 		ability = new BasicGroupAbility(Global.AbilityType.ANY_ATTEMPT, nuclearPowerCompanies, Global.AttackType.DESTROY, 2);
 		outwardArrows = new ArrayList<GroupCard.Arrow>();
 		outwardArrows.add(GroupCard.Arrow.TOP);
-		groupCard = new GroupCard("Anti-Nuclear Activists", 2, 0, 5, 1, IMAGE_PATH + "Anti-NuclearActivists.png", GroupCard.Arrow.LEFT, outwardArrows, GroupCard.Alignment.LIBERAL, ability);				
+		groupCard = new GroupCard("Anti-Nuclear Activists", 2, 0, 5, 1, IMAGE_PATH + "AntiNuclearActivists.png", GroupCard.Arrow.LEFT, outwardArrows, GroupCard.Alignment.LIBERAL, ability);				
 		deck.add(groupCard);
 		
 		//Antiwar Activists
@@ -103,7 +102,7 @@ public class Deck {
 		outwardArrows.add(GroupCard.Arrow.TOP);
 		outwardArrows.add(GroupCard.Arrow.BOTTOM);
 		outwardArrows.add(GroupCard.Arrow.LEFT);
-		groupCard = new GroupCard("CFL-AIO", 6, 0, 5, 3, IMAGE_PATH + "CFL-AIO.png", GroupCard.Arrow.RIGHT, outwardArrows, GroupCard.Alignment.LIBERAL);				
+		groupCard = new GroupCard("CFL-AIO", 6, 0, 5, 3, IMAGE_PATH + "CFLAIO.png", GroupCard.Arrow.RIGHT, outwardArrows, GroupCard.Alignment.LIBERAL);				
 		deck.add(groupCard);
 		
 		//Chinese Campaign Donors
@@ -158,7 +157,7 @@ public class Deck {
 		outwardArrows.add(GroupCard.Arrow.BOTTOM);
 		alignments = new ArrayList<GroupCard.Alignment>();
 		alignments.add(GroupCard.Alignment.STRAIGHT);
-		groupCard = new GroupCard("Convenience Stores",1,0,4,3,IMAGE_PATH + "Convenience Stores.png",GroupCard.Arrow.LEFT,outwardArrows,alignments);
+		groupCard = new GroupCard("Convenience Stores",1,0,4,3,IMAGE_PATH + "ConvenienceStores.png",GroupCard.Arrow.LEFT,outwardArrows,alignments);
 		deck.add(groupCard);
 		
 		//CopyShops
@@ -826,9 +825,6 @@ public class Deck {
 		//White Collar Crime
 		specialCard = new SpecialCard("White Collar Crime", IMAGE_PATH + "WhiteCollarCrime.png");
 		deck.add(specialCard);
-//
-	
-
 	}
 	
 	//Randomly returns an IlluminatiCard contained in illuminatiDeck
