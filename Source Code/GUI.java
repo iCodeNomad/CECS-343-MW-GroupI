@@ -258,9 +258,26 @@ public class GUI {
 		panel.add(playerActionsPanel);
 		playerActionsPanel.setLayout(null);
 		
-		JButton btnNext = new JButton("Transfer Money");
-		btnNext.setBounds(153, 38, 130, 29);
-		playerActionsPanel.add(btnNext);
+		JButton btnTransfer = new JButton("Transfer Money");
+		btnTransfer.setBounds(153, 38, 130, 29);
+		playerActionsPanel.add(btnTransfer);
+		btnTransfer.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(Global.isMainPhase){
+					int playerTransferMoneyTo = Integer.parseInt(transferMoney());
+					int playerTransferPlayerTo = Integer.parseInt(transferMoneytoPlayer());
+					player.Illuminati().removeMoney(playerTransferMoneyTo);
+					GamePlay.players.get(playerTransferPlayerTo).Illuminati().addMoney(playerTransferMoneyTo);
+					
+					player.Illuminati().cardGUI().updateMoney();
+					GamePlay.players.get(playerTransferPlayerTo).Illuminati().cardGUI().updateMoney();
+				}
+			}
+		});
+		
+		
+//playerActionsPanel.add(btnNext);
+
 		
 		JLabel lblCardActionsJ = new JLabel("Player Actions");
 		lblCardActionsJ.setBounds(6, 6, 121, 20);
@@ -300,7 +317,7 @@ public class GUI {
 			}
 		});
 		
-		JButton btnUseASpecial = new JButton("Use a Specialty ");
+		JButton btnUseASpecial = new JButton("Use a Special");
 		btnUseASpecial.setBounds(10, 96, 130, 29);
 		playerActionsPanel.add(btnUseASpecial);
 		
@@ -329,7 +346,7 @@ public class GUI {
 		panel.add(panel_1);
 		panel_1.setLayout(null);
 		
-		JLabel lblNewLabel = new JLabel("Total balance:");
+		/*JLabel lblNewLabel = new JLabel("Total balance:");
 		lblNewLabel.setBounds(6, 6, 99, 16);
 		panel_1.add(lblNewLabel);
 		
@@ -337,7 +354,7 @@ public class GUI {
 		textField.setText("$200");
 		textField.setBounds(99, 1, 130, 26);
 		panel_1.add(textField);
-		textField.setColumns(10);
+		textField.setColumns(10);*/
 		
 		Thread chatThread = new Thread(){
 			public void run(){
@@ -447,9 +464,9 @@ public class GUI {
 	}
 	
 	private void designateDefendingGroup(StructureCard card){
-		if(GamePlay.defendingPlayer != null && GamePlay.defendingPlayer.Illuminati().Name().equals("The Discordian Society") && checkDiscordian(card)){
+		/*if(GamePlay.defendingPlayer != null && GamePlay.defendingPlayer.Illuminati().Name().equals("The Discordian Society") && checkDiscordian(card)){
 			DialogBox("The Discordian Society is immune to this card.");
-		}else{
+		}else{*/
 			if(card == GamePlay.attackingGroup){
 				DialogBox("A group cannot attack itself!");
 			}else if(card instanceof IlluminatiCard){
@@ -481,7 +498,7 @@ public class GUI {
 					}
 				}
 			}
-		}
+		//}
 	}
 	
 	private boolean checkDiscordian(StructureCard card){
@@ -1036,6 +1053,15 @@ public class GUI {
 	public static void createUncontrolledGUI(){
 		uncontrolledGUI = new UncontrolledGUI();
 	}
+	
+	//for transferring to group
+	private String transferMoneytoPlayer(){
+        return JOptionPane.showInputDialog(frame, "Player:", "Give money to", JOptionPane.QUESTION_MESSAGE);
+    }
+	//for transfer money
+	private String transferMoney(){
+        return JOptionPane.showInputDialog(frame, "$ MB:", "How much money?", JOptionPane.QUESTION_MESSAGE);
+    }
 	
 	//---------------------------Server-client connection------------------------------------------
 	private String getUsername(){

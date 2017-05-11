@@ -171,7 +171,6 @@ public class GamePlay {
 		int drawCounter = 1;
 		
 		if(player.Illuminati().Name().equals("The Network")){
-			System.out.println("Here");
 			drawCounter = 2;
 		}
 		
@@ -242,13 +241,13 @@ public class GamePlay {
 				attackModifier += ((GroupCard) attackingGroup).GunLobbyCheck(defendingGroup);
 						
 				//Calculate attack modifier based on "direct control" ability
-				attackModifier += ((GroupCard) attackingGroup).CalculateDirectControlAbility(defendingGroup, attackType);
-				
-				//Uses BFS to calculate attack modifier based on power structure position
-				if(defendingPlayer != null){
-					attackModifier += ((GroupCard) defendingGroup).CalculateStructureResistance();
-				}
-			}		
+				attackModifier += ((GroupCard) attackingGroup).CalculateDirectControlAbility(defendingGroup, attackType);	
+			}	
+			
+			//Uses BFS to calculate attack modifier based on power structure position
+			if(defendingPlayer != null){
+				attackModifier += ((GroupCard) defendingGroup).CalculateStructureResistance();
+			}
 			
 			//Calculate "Any Attempt" Abilities
 			attackModifier += CalculateAnyAttempt(attackingPlayer, defendingGroup, attackType);
@@ -328,7 +327,7 @@ public class GamePlay {
 			}else{
 				attackingPlayer.GUI().DialogBox("Attack was unsuccessful...");
 			}
-		
+			
 		
 			//Reduce attack counter by one for attacking and aiding groups
 			attackingGroup.attackCounter--;
@@ -456,6 +455,8 @@ public class GamePlay {
 			aidingPower += card.transferablePower;
 		}
 		
+		aidingGroups = new ArrayList<StructureCard>();
+		
 		return aidingPower;
 	}
 	
@@ -463,7 +464,6 @@ public class GamePlay {
 		int playerResponse = JOptionPane.showConfirmDialog(null, "Would you like to use your special ability to spend 5 MB to make this attack privileged?");
 		if(playerResponse == JOptionPane.YES_OPTION){
 			attackingGroup.Owner().Illuminati().removeMoney(5);
-			System.out.println("HERE IN PRI");
 			return Global.Privilege.PRIVILEGED;
 		}
 		
@@ -551,8 +551,6 @@ public class GamePlay {
 		int phaseModifier = 0;
 		boolean spentThisPhase = true;
 		
-		System.out.println(privilege);
-		
 		while(spentThisPhase){
 			spentThisPhase = false;
 			phaseModifier = 0;
@@ -637,6 +635,33 @@ public class GamePlay {
 				Thread.sleep(200);
 			}catch(Exception e){}
 		}
+		
+		String input = null;
+		int intInput;
+		
+		while(input == null){
+			input = (String) JOptionPane.showInputDialog(attackingPlayer.GUI().Frame(), "Enter the amount of MB to transfer from the attacking group to the new group: (" + attackingGroup.CurrentMoney() + " MB max)", "Spend Money", JOptionPane.PLAIN_MESSAGE, null, null, "0");
+
+			try{
+				intInput = Integer.parseInt(input);
+				if(intInput > attackingGroup.CurrentMoney() || intInput < 0){
+					attackingPlayer.GUI().DialogBox("Invalid input!");
+					input = null;
+				}else{
+					attackingGroup.removeMoney(intInput);
+					defendingGroup.addMoney(intInput);
+				}
+			}catch(NumberFormatException e){
+				attackingPlayer.GUI().DialogBox("Invalid input!");
+				input = null;
+			}
+		}
+		
+		for(GroupCard card: attackingPlayer.GroupCards()){
+			card.cardGUI().updateMoney();
+		}
+		attackingPlayer.Illuminati().cardGUI().updateMoney();
+		
 		
 		GUI.uncontrolledGUI.update();
 		attackingPlayer.GUI().Frame().repaint();
